@@ -26,7 +26,7 @@ const DisconnectButton = ({
     setUserAddress("");
     setUserBalance(0);
     setWallet(null);
-    const tezosTK = new TezosToolkit("https://api.tez.ie/rpc/delphinet");
+    const tezosTK = new TezosToolkit("https://edonet.smartpy.io");
     setTezos(tezosTK);
     setBeaconConnection(false);
     setPublicToken(null);

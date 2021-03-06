@@ -52,7 +52,7 @@ const ConnectButton = ({
     try {
       const wallet = new BeaconWallet({
         name: "Taquito Boilerplate",
-        preferredNetwork: NetworkType.DELPHINET,
+        preferredNetwork: NetworkType.EDONET,
         disableDefaultEvents: true, // Disable all events / UI. This also disables the pairing alert.
         eventHandlers: {
           // To keep the pairing alert, we have to add the following default event handlers back
@@ -67,8 +67,8 @@ const ConnectButton = ({
       Tezos.setWalletProvider(wallet);
       await wallet.requestPermissions({
         network: {
-          type: NetworkType.DELPHINET,
-          rpcUrl: "https://api.tez.ie/rpc/delphinet"
+          type: NetworkType.EDONET,
+          rpcUrl: "https://edonet.smartpy.io"
         }
       });
       setWallet(wallet);
