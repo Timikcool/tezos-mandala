@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TezosToolkit } from "@taquito/taquito";
 import "./App.css";
 import ConnectButton from "./components/ConnectWallet";
@@ -12,42 +12,18 @@ import { Container } from "@chakra-ui/layout";
 import { Route, Router, Switch } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import MainPage from "./pages/MainPage";
+import { useApp } from "./state/app";
+import { ExplorePage } from "./pages/ExplorePage";
 
-enum BeaconConnection {
-  NONE = "",
-  LISTENING = "Listening to P2P channel",
-  CONNECTED = "Channel connected",
-  PERMISSION_REQUEST_SENT = "Permission request sent, waiting for response",
-  PERMISSION_REQUEST_SUCCESS = "Wallet is connected"
-}
+
 
 const App = () => {
-  const [Tezos, setTezos] = useState<TezosToolkit>(
-    new TezosToolkit("https://edonet.smartpy.io/")
-  );
-  const [contract, setContract] = useState<any>(undefined);
-  const [publicToken, setPublicToken] = useState<string | null>("");
-  const [wallet, setWallet] = useState<any>(null);
-  const [userAddress, setUserAddress] = useState<string>("");
-  const [userBalance, setUserBalance] = useState<number>(0);
-  const [storage, setStorage] = useState<number>(0);
-  const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
-  const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("transfer");
-
-  // * contract
-  // https://better-call.dev/edo2net/KT1C1ESWEedUGdSPvWsaKJQNhkUJUHuXBVQU
-  const contractAddress: string = "KT1C1ESWEedUGdSPvWsaKJQNhkUJUHuXBVQU";
-
-  const generateQrCode = (): { __html: string } => {
-    const qr = qrcode(0, "L");
-    qr.addData(publicToken || "");
-    qr.make();
-
-    return { __html: qr.createImgTag(4) };
-  };
 
   const history = createBrowserHistory({});
+  const { reconnectWallet } = useApp()
+  useEffect(() => {
+    reconnectWallet()
+  }, [])
   return (
 
     <Container maxW="container.lg">
@@ -56,6 +32,7 @@ const App = () => {
           <Header />
           <Switch>
             <Route exact path='/' component={MainPage} />
+            <Route exact path='/explore' component={ExplorePage} />
           </Switch>
         </Router>
       </VStack>

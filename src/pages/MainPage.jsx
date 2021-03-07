@@ -3,8 +3,10 @@ import { Flex, Text, VStack } from "@chakra-ui/layout";
 import { Button, IconButton } from "@chakra-ui/react";
 import React from "react";
 import { HashLink } from "react-router-hash-link";
+import BuySeedModal from "../components/BuySeedModal";
 import Header from "../components/Header";
 import PageHeader from "../components/PageHeader";
+import { useApp } from "../state/app";
 
 // const scrollToCreateMandala = document
 //   .querySelector("#create-mandala")
@@ -14,6 +16,15 @@ const MainPage = () => {
   //   const scrollToCreateMandala = document
   //     .querySelector("#create-mandala")
   //     ?.scrollIntoView({ behavior: "smooth" });
+
+  const { connectWallet, buySeed, wallet } = useApp();
+  const handleGetMandala = async () => {
+    if (!wallet) {
+      await connectWallet();
+    }
+
+    buySeed();
+  };
   return (
     <VStack>
       <Flex h="calc(100vh - 104px)" align="center">
@@ -50,52 +61,72 @@ const MainPage = () => {
             decentralized.
           </Text>
           <Flex w="100%" justify="center">
-            <Button colorScheme="orange">Create Mandala</Button>
+            <BuySeedModal />
           </Flex>
         </VStack>
       </Flex>
-      <Flex h="100vh" align="center" id="why-tezos-mandala">
+      <Flex minHeight="100vh" align="center" id="why-tezos-mandala">
         <VStack spacing={16}>
           <Text fontSize="5xl" align="center">
             Why Tezos Mandala
           </Text>
           {/* <PageHeader></PageHeader> */}
-          <Text fontSize="lg" fontWeight="300">
-            Tezos Mandala это цифровое генеративное искусство. Это эксперимент
-            на тему западной психологической интерпретации мандалы. Все началось
-            с К. Юнга: I sketched every morning in a notebook a small circular
-            drawing, ... which seemed to correspond to my inner situation at the
-            time. ... Only gradually did I discover what the mandala really is:
-            ... the Self, the wholeness of the personality, which if all goes
-            well is harmonious. — Carl Jung, Memories, Dreams, Reflections, pp.
-            195–196. Для Юнга мандала это способ взаимодействия с
-            бессознательным, способ погружения в себя и ребалансировки. Юнг
-            говорил о физических мандалах, которые человек рисует здесь и
-            сейчас. Цифровые Tezos Mandalas человек рисует здесь и сейчас своим
-            уникальным хешем. Чтобы создать свою мандалу, вам понадобится
-            mandala seed. Вы можете сгенерировать мандалу из своего mandala seed
-            в любой момент, когда посчитаете нужным. Для этого вам нужно перейти
-            в My Collections, выбрать mandala seed и нажать кнопку “create
-            mandala”. Вы отправляете транзакцию, и смарт-контракт генерирует
-            мандалу из хеша этой транзакции. Ни мы, ни вы, никто не знает, какой
-            будет ваша мандала. Мы можем сказать только, что это будет
-            уникальная мандала, построенная из элементов разной степени
-            редкости. Самые редкие элементы это глаз или знак Tezos в центре
-            мандалы. Гамма цветов элементов мандалы связана со значением этих
-            элементов, а гамма фона мандалы о цветах экосистемы Tezos. Только
-            несколько мандал не будут соответствовать этим правилам. Tezos
-            Mandala генерируется с initial name. В нем будут добрые слова. Через
-            месяц, когда вы познакомитесь со своей мандалой, вы сможете дать ей
-            свое имя. После этого изменить имя мандалы будет сложнее: нужно
-            владеть ею без перерыва минимум два месяца. После этого мандалу
-            можно будет переименовать через четыре месяца, потом через восемь
-            месяцев и так далее - после каждого переименования срок будет
-            увеличиваться вдвое. Tezos Mandalas хранятся не в облаке Amazon и
-            даже не в IPFS - они навсегда записаны в блокчейн Tezos. Всего будет
-            сгенерировано 2000 мандал. Mandala seeds will be sold at increasing
-            price to reward early adopters of the project. Для генерации
-            осталось [Х] мандал.
-          </Text>
+          <VStack spacing={8} align="start">
+            <Text fontSize="lg" align="left" fontWeight="300">
+              Tezos Mandala is computer-generated art. It’s an experiment based
+              on Western psychological interpretation of mandala.
+            </Text>
+            <Text fontSize="lg" align="left" fontWeight="300">
+              It all started with Carl Jung:
+            </Text>
+            <Text fontSize="lg" align="left" fontWeight="300">
+              I sketched every morning in a notebook a small circular drawing,
+              ... which seemed to correspond to my inner situation at the time.
+              ... Only gradually did I discover what the mandala really is: ...
+              the Self, the wholeness of the personality, which if all goes well
+              is harmonious.
+            </Text>
+            <Text fontSize="lg" align="left" fontWeight="300">
+              — Carl Jung, Memories, Dreams, Reflections, pp. 195–196.
+            </Text>
+            <Text fontSize="lg" align="left" fontWeight="300">
+              Mandala for Jung was a way of interaction with our unconscious
+              meaning, a way of plunging into inner self and rebalancing.
+            </Text>
+            <Text fontSize="lg" align="left" fontWeight="300">
+              Jung was talking about physical mandalas which a person was
+              drawing here and now. A person is drawing a digital Tezos Mandala
+              here and now by one’s unique hash. You click the button, send the
+              transaction and the smart contract generates a mandala from the
+              hash of this transaction. No one knows how your mandala will look
+              like. We only can tell you that it will be a unique mandala built
+              from elements of a different degree of rarity. The rarest elements
+              are an eye and the Tezos sign in the centre of mandala.
+            </Text>
+            <Text fontSize="lg" align="left" fontWeight="300">
+              Tezos Mandala is generated from an initial name. There will be
+              some kind words for you. A month later, when you meet your Mandala
+              for the first time you can name it. It will be more difficult to
+              change the name of your Mandala after that and only possible after
+              three months of its nonstop possession.
+            </Text>
+            <Text fontSize="lg" align="left" fontWeight="300">
+              There will be generated 2000 mandala altogether. Take a look at
+              the counter at the top of the screen to know how many mandalas are
+              left for generating.
+            </Text>
+
+            <Flex w="100%" justify="center">
+              <Button
+                variant="outline"
+                colorScheme="black"
+                border="none"
+                onClick={handleGetMandala}
+              >
+                Get Mandala
+              </Button>
+            </Flex>
+          </VStack>
         </VStack>
       </Flex>
 
