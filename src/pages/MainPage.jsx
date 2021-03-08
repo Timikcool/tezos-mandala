@@ -1,12 +1,16 @@
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { Flex, Text, VStack } from "@chakra-ui/layout";
+import { Box, Flex, Text, VStack, Wrap } from "@chakra-ui/layout";
 import { Button, IconButton } from "@chakra-ui/react";
-import React from "react";
+import { range } from "lodash";
+import React, { useEffect, useState } from "react";
 import { HashLink } from "react-router-hash-link";
 import BuySeedModal from "../components/BuySeedModal";
 import Header from "../components/Header";
 import PageHeader from "../components/PageHeader";
+import { getContractStorage } from "../service/bcd";
 import { useApp } from "../state/app";
+import config from "../config";
+import selectObjectByKeys from "../utils/selectObjectByKeys";
 
 // const scrollToCreateMandala = document
 //   .querySelector("#create-mandala")
@@ -18,6 +22,7 @@ const MainPage = () => {
   //     ?.scrollIntoView({ behavior: "smooth" });
 
   const { connectWallet, buySeed, wallet } = useApp();
+  const [nextId, setNextId] = useState(1);
   const handleGetMandala = async () => {
     if (!wallet) {
       await connectWallet();
@@ -25,6 +30,15 @@ const MainPage = () => {
 
     buySeed();
   };
+  const getCurrentPosition = async () => {
+    const storage = await getContractStorage(config.contract);
+    const nextId = selectObjectByKeys(storage, {
+      type: "nat",
+      name: "next_id",
+    })?.value;
+    setNextId(parseInt(nextId || 2) - 1);
+  };
+  useEffect(() => getCurrentPosition(), []);
   return (
     <VStack>
       <Flex h="calc(100vh - 104px)" align="center">
@@ -60,6 +74,52 @@ const MainPage = () => {
             recorded in the Tezos blockchain forever, so that they are truly
             decentralized.
           </Text>
+          <Wrap>{/* 6 mandalas here */}</Wrap>
+          <VStack w="100%">
+            <Flex
+              className="line"
+              w="100%"
+              h="4px"
+              background="orange.500"
+              position="relative"
+            >
+              {range(1, 20).map((stage) => (
+                <Flex
+                  className={`stage-${stage}-end`}
+                  position="absolute"
+                  h="100%"
+                  left={`${stage * 5}%`}
+                  w="1px"
+                  background="black"
+                />
+              ))}
+              <Flex
+                className="left-to-mint"
+                position="absolute"
+                top="-24px"
+                left={`calc(${(nextId / 2000) * 100}% - 7px)`}
+              >
+                <Text fontSize="xs">{`${2000 - nextId}`}</Text>
+              </Flex>
+              <Flex
+                className="current-pointer"
+                position="absolute"
+                w="10px"
+                h="10px"
+                background="red.500"
+                borderRadius="100%"
+                top="-2.5px"
+                left={`${(nextId / 2000) * 100}%`}
+              />
+            </Flex>
+            <Flex className="prices" w="100%" justify="space-around">
+              {range(1, 21).map((stage) => (
+                <Flex className={`stage-${stage}-price`} marginLeft="12px">
+                  <Text fontSize="xs">{`${stage * 5}tz`}</Text>
+                </Flex>
+              ))}
+            </Flex>
+          </VStack>
           <Flex w="100%" justify="center">
             <BuySeedModal />
           </Flex>

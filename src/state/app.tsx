@@ -59,10 +59,10 @@ export const AppProvider: React.FC = ({ children }) => {
             // starting_price = 1tz
             // price_step = 2tz
             const storage = await getContractStorage(config.contract);
-            const startingPrice = tzToMutez(1);
-            const priceStep = tzToMutez(2);
+            const startingPrice = tzToMutez(5);
+            const priceStep = tzToMutez(5);
             const id = parseInt(selectObjectByKeys(storage, { type: 'nat', name: "next_id" })?.value) - 1;
-            const price = tzToMutez(1 + (id / 100) * 2);
+            const price = tzToMutez(5 + (id / 100) * 5);
             console.log({ price, id, priceStep, startingPrice });
 
             const op = await contract.methods.buy(1).send({ amount: 10000000, mutez: true });
