@@ -14,12 +14,13 @@ import { createBrowserHistory } from 'history';
 import MainPage from "./pages/MainPage";
 import { useApp } from "./state/app";
 import { ExplorePage } from "./pages/ExplorePage";
+import { MyCollectionPage } from "./pages/MyCollectionPage";
 
-
+const history = createBrowserHistory({});
 
 const App = () => {
 
-  const history = createBrowserHistory({});
+
   const { reconnectWallet } = useApp()
   useEffect(() => {
     reconnectWallet()
@@ -27,12 +28,13 @@ const App = () => {
   return (
 
     <Container maxW="container.lg">
-      <VStack spacing={8}>
+      <VStack spacing={16}>
         <Router history={history}>
           <Header />
           <Switch>
             <Route exact path='/' component={MainPage} />
             <Route exact path='/explore' component={ExplorePage} />
+            <Route exact path='/my-collection' component={MyCollectionPage} />
           </Switch>
         </Router>
       </VStack>

@@ -8,6 +8,9 @@ import {
     defaultEventCallbacks
 } from "@airgap/beacon-sdk";
 import config from '../config.json';
+import { getContractStorage } from '../service/bcd';
+import selectObjectByKeys from '../utils/selectObjectByKeys';
+import { tzToMutez } from '../utils/mutez';
 
 export enum BeaconConnection {
     NONE = "",
@@ -42,7 +45,7 @@ export const AppProvider: React.FC = ({ children }) => {
     const [activeTab, setActiveTab] = useState<string>("transfer");
 
     const [buyingSeed, setBuyingSeed] = useState<boolean>(false);
-    const [loadingDecrement, setLoadingDecrement] = useState<boolean>(false);
+    const [convertingSeed, setConvertingSeed] = useState<boolean>(false);
 
     // * contract
     // https://better-call.dev/edo2net/KT1C1ESWEedUGdSPvWsaKJQNhkUJUHuXBVQU
@@ -52,7 +55,16 @@ export const AppProvider: React.FC = ({ children }) => {
     const buySeed = useCallback(async () => {
         setBuyingSeed(true);
         try {
-            //   ! 10000000 hardcoded
+            // starting_price + (id / 100) * price_step;
+            // starting_price = 1tz
+            // price_step = 2tz
+            const storage = await getContractStorage(config.contract);
+            const startingPrice = tzToMutez(1);
+            const priceStep = tzToMutez(2);
+            const id = parseInt(selectObjectByKeys(storage, { type: 'nat', name: "next_id" })?.value) - 1;
+            const price = tzToMutez(1 + (id / 100) * 2);
+            console.log({ price, id, priceStep, startingPrice });
+
             const op = await contract.methods.buy(1).send({ amount: 10000000, mutez: true });
             await op.confirmation();
             // const newStorage: any = await contract.storage();
@@ -67,10 +79,10 @@ export const AppProvider: React.FC = ({ children }) => {
         }
     }, [contract]);
 
-    const decrement = async (): Promise<void> => {
-        setLoadingDecrement(true);
+    const convertSeed = async (id): Promise<void> => {
+        setConvertingSeed(true);
         try {
-            const op = await contract.methods.decrement(1).send();
+            const op = await contract.methods.render(1).send();
             await op.confirmation();
             const newStorage: any = await contract.storage();
             if (newStorage) setStorage(newStorage.toNumber());
@@ -78,7 +90,7 @@ export const AppProvider: React.FC = ({ children }) => {
         } catch (error) {
             console.log(error);
         } finally {
-            setLoadingDecrement(false);
+            setConvertingSeed(false);
         }
     };
 

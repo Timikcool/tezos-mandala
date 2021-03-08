@@ -35,69 +35,10 @@ const ConnectButton = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingNano, setLoadingNano] = useState<boolean>(false);
 
-  const setup = async (userAddress: string): Promise<void> => {
-    setUserAddress(userAddress);
-    // updates balance
-    const balance = await Tezos.tz.getBalance(userAddress);
-    setUserBalance(balance.toNumber());
-    // creates contract instance
-    const contract = await Tezos.wallet.at(contractAddress);
-    const storage: any = await contract.storage();
-    setContract(contract);
-    setStorage(storage.toNumber());
-  };
 
-  const connectWallet = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      const wallet = new BeaconWallet({
-        name: "Taquito Boilerplate",
-        preferredNetwork: NetworkType.EDONET,
-        disableDefaultEvents: true, // Disable all events / UI. This also disables the pairing alert.
-        eventHandlers: {
-          // To keep the pairing alert, we have to add the following default event handlers back
-          [BeaconEvent.PAIR_INIT]: {
-            handler: defaultEventCallbacks.PAIR_INIT
-          },
-          [BeaconEvent.PAIR_SUCCESS]: {
-            handler: data => setPublicToken(data.publicKey)
-          }
-        }
-      });
-      Tezos.setWalletProvider(wallet);
-      await wallet.requestPermissions({
-        network: {
-          type: NetworkType.EDONET,
-          rpcUrl: "https://edonet.smartpy.io"
-        }
-      });
-      setWallet(wallet);
-      // gets user's address
-      const userAddress = await wallet.getPKH();
-      await setup(userAddress);
-      setBeaconConnection(true);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  };
 
-  const connectNano = async (): Promise<void> => {
-    try {
-      setLoadingNano(true);
-      const transport = await TransportU2F.create();
-      const ledgerSigner = new LedgerSigner(transport, "44'/1729'/0'/0'", true);
 
-      Tezos.setSignerProvider(ledgerSigner);
 
-      //Get the public key and the public key hash from the Ledger
-      const userAddress = await Tezos.signer.publicKeyHash();
-      await setup(userAddress);
-    } catch (error) {
-      console.log("Error!", error);
-      setLoadingNano(false);
-    }
-  };
 
   return (
     <div className="buttons">

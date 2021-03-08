@@ -8,6 +8,7 @@ import { getBigMapKeys, getContractStorage } from "../service/bcd";
 import config from "../config.json";
 import selectObjectByKeys from "../utils/selectObjectByKeys";
 import MandalaCard from "../components/MandalaCard";
+import { useApp } from "../state/app";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
@@ -26,67 +27,73 @@ const sortBySorter = (mandalas, sorter) => {
   }
 };
 
-export const ExplorePage = () => {
+export const MyCollectionPage = () => {
   const [rarityFilter, setRarityFilter] = useState("all");
   const [loading, setLoading] = useState(false);
   const [filteredMandalas, setFilteredMandalas] = useState([]);
   const [totalMandalas, setTotalMandalas] = useState([]);
   const [sort, setSort] = useState("new");
 
+  const { userAddress } = useApp();
+
   const getStorage = async () => {
-    setLoading(true);
-    try {
-      const storage = await getContractStorage(config.contract);
-      const tokensMapId = selectObjectByKeys(storage, {
-        type: "big_map",
-        name: "token_metadata",
-      })?.value;
-      const ownersMapId = selectObjectByKeys(storage, {
-        type: "big_map",
-        name: "ledger",
-      })?.value;
-      const [tokens, owners] = await Promise.all([
-        getBigMapKeys(tokensMapId, 2000),
-        getBigMapKeys(ownersMapId, 2000),
-      ]);
+    if (userAddress) {
+      setLoading(true);
+      try {
+        const storage = await getContractStorage(config.contract);
+        const tokensMapId = selectObjectByKeys(storage, {
+          type: "big_map",
+          name: "token_metadata",
+        })?.value;
+        const ownersMapId = selectObjectByKeys(storage, {
+          type: "big_map",
+          name: "ledger",
+        })?.value;
+        const [tokens, owners] = await Promise.all([
+          getBigMapKeys(tokensMapId, 2000),
+          getBigMapKeys(ownersMapId, 2000),
+        ]);
 
-      const totalMandalas = tokens.reduce((acc, token) => {
-        //   const id = selectObjectByKeys(token, {type:'nat', name:'key'})
-        const id = token.data.key_string;
-        if (id === "0") return acc;
+        const totalMandalas = tokens.reduce((acc, token) => {
+          //   const id = selectObjectByKeys(token, {type:'nat', name:'key'})
+          const id = token.data.key_string;
+          if (id === "0") return acc;
 
-        const timestamp = token.data.timestamp;
-        const rarity = selectObjectByKeys(token.data.value, {
-          type: "bytes",
-          name: "name",
-        })?.value?.replace(/['"]+/g, "");
-        const hash = token.data.key_hash;
-        const owner = owners.find(
-          (owner) =>
-            selectObjectByKeys(owner.data.key, {
-              type: "nat",
-              name: "token_id",
-            })?.value === id
-        );
-        const ownerAddress = selectObjectByKeys(owner?.data.key, {
-          type: "address",
-          name: "owner",
-        }).value;
+          const timestamp = token.data.timestamp;
+          const rarity = selectObjectByKeys(token.data.value, {
+            type: "bytes",
+            name: "name",
+          })?.value?.replace(/['"]+/g, "");
+          const hash = token.data.key_hash;
+          const owner = owners.find(
+            (owner) =>
+              selectObjectByKeys(owner.data.key, {
+                type: "nat",
+                name: "token_id",
+              })?.value === id
+          );
+          const ownerAddress = selectObjectByKeys(owner?.data.key, {
+            type: "address",
+            name: "owner",
+          }).value;
 
-        return [...acc, { id, timestamp, rarity, hash, ownerAddress }];
-      }, []);
+          if (ownerAddress !== userAddress) return acc;
 
-      // const keys = await get;
-      console.log({ storage, tokens, owners, totalMandalas });
-      setTotalMandalas(totalMandalas);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
+          return [...acc, { id, timestamp, rarity, hash, ownerAddress }];
+        }, []);
+
+        // const keys = await get;
+        console.log({ storage, tokens, owners, totalMandalas });
+        setTotalMandalas(totalMandalas);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
     }
   };
 
-  useEffect(() => getStorage(), []);
+  useEffect(() => getStorage(), [userAddress]);
 
   useEffect(() => {
     // * filter mandalas by filter
@@ -107,7 +114,7 @@ export const ExplorePage = () => {
   return (
     <VStack spacing={16} w="100%">
       <Text fontSize="5xl" align="center">
-        Explore Mandalas
+        My Collection
       </Text>
 
       {loading ? (
@@ -121,11 +128,12 @@ export const ExplorePage = () => {
       ) : (
         <>
           <RaritySelector onChange={setRarityFilter} value={rarityFilter} />
-          <Flex justify="center" w="100%">
+          <VStack justify="center" w="100%" spacing={4}>
             <Text align="center" fontSize="3xl">
               {`${startCase(rarityFilter)} (${filteredMandalas.length})`}
             </Text>
-          </Flex>
+            <Text>{userAddress}</Text>
+          </VStack>
 
           <HStack spacing={4} w="100%">
             <Text fontSize="lg" align="left" fontWeight="300" w="65px">

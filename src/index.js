@@ -22,11 +22,34 @@ const theme = extendTheme({
           boxShadow: "2px 2px 4px #d9d9d9, -2px -2px 4px #ffffff",
         },
       },
+
+      variants: {
+        "mandala-card": {
+          boxShadow: "none",
+          background: "linear-gradient(145deg, #ffffff, #e6e6e6)",
+          _hover: {
+            boxShadow: "10px 10px 20px #d9d9d9, -10px -10px 20px #ffffff",
+          },
+          _focus: {
+            boxShadow: "none",
+          },
+        },
+      },
+    },
+    Tab: {
+      variants: {
+        rarity: {
+          borderTop: "2px solid",
+        },
+      },
     },
   },
   colors: {
     text: { 500: "#14213D" },
     orange: { 500: "#FCA311" },
+    "orange-tabs": {
+      600: "#FCA311",
+    },
   },
 });
 

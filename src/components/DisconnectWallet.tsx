@@ -21,22 +21,6 @@ const DisconnectButton = ({
   setTezos,
   setBeaconConnection
 }: ButtonProps): JSX.Element => {
-  const disconnectWallet = async (): Promise<void> => {
-    //window.localStorage.clear();
-    setUserAddress("");
-    setUserBalance(0);
-    setWallet(null);
-    const tezosTK = new TezosToolkit("https://edonet.smartpy.io");
-    setTezos(tezosTK);
-    setBeaconConnection(false);
-    setPublicToken(null);
-    console.log("disconnecting wallet");
-    if (wallet) {
-      await wallet.client.removeAllAccounts();
-      await wallet.client.removeAllPeers();
-      await wallet.client.destroy();
-    }
-  };
 
   return (
     <div className="buttons">
