@@ -40,9 +40,9 @@ const MainPage = () => {
   };
   useEffect(() => getCurrentPosition(), []);
   return (
-    <VStack>
+    <VStack maxW="100%">
       <Flex h="calc(100vh - 104px)" align="center">
-        <VStack spacing={8}>
+        <VStack spacing={8} maxW="100%">
           <Text fontSize="5xl" align="center">
             Tezos Mandala: a Generative Art Project
           </Text>
@@ -63,8 +63,8 @@ const MainPage = () => {
           </Flex>
         </VStack>
       </Flex>
-      <Flex h="100vh" align="center" id="create-mandala">
-        <VStack spacing={16}>
+      <Flex h="100vh" align="center" id="create-mandala" maxW="100%">
+        <VStack spacing={16} maxW="100%">
           <Text fontSize="5xl" align="center">
             Create Your Mandala
           </Text>
@@ -112,13 +112,18 @@ const MainPage = () => {
                 left={`${(nextId / 2000) * 100}%`}
               />
             </Flex>
-            <Flex className="prices" w="100%" justify="space-around">
+            <Box
+              display={{ base: "none", md: "flex" }}
+              className="prices"
+              w="100%"
+              justifyContent="space-around"
+            >
               {range(1, 21).map((stage) => (
                 <Flex className={`stage-${stage}-price`} marginLeft="12px">
                   <Text fontSize="xs">{`${stage * 5}tz`}</Text>
                 </Flex>
               ))}
-            </Flex>
+            </Box>
           </VStack>
           <Flex w="100%" justify="center">
             <BuySeedModal />

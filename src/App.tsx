@@ -28,7 +28,7 @@ const App = () => {
   return (
 
     <Container maxW="container.lg">
-      <VStack spacing={16}>
+      <VStack spacing={16} maxW="100%">
         <Router history={history}>
           <Header />
           <Switch>
