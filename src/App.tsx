@@ -23,7 +23,7 @@ const App = () => {
 
   const { reconnectWallet } = useApp()
   useEffect(() => {
-    reconnectWallet()
+    // reconnectWallet()
   }, [])
   return (
 
