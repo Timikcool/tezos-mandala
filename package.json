@@ -39,6 +39,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "deploy": "shipit production copy-build",
     "update-taquito": "ncu -u --target newest --filter '/^@taquito.*$/' && npm i && git add . && git commit -m \"Updated Taquito version\" && git push"
   },
   "eslintConfig": {
@@ -59,6 +60,8 @@
   "devDependencies": {
     "@types/react-router-dom": "^5.1.7",
     "@types/react-router-hash-link": "^1.2.1",
-    "@types/styled-components": "^5.1.7"
+    "@types/styled-components": "^5.1.7",
+    "shipit-cli": "^5.3.0",
+    "shipit-deploy": "^5.3.0"
   }
 }
