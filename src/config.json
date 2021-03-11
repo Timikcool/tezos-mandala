@@ -5,6 +5,6 @@
     "network": "edo2net",
     "networkType": "edonet",
     "rpc": "https://edonet.smartpy.io",
-    "contract": "KT1PtfkoEhhz1bbZJq5SLJmorxdQGTd5XpdF",
+    "contract": "KT1SrqjcVFjFTHb22msQ5fFSNMzSzWdpgz8c",
     "tokenService": "https://tezos-mandala.art"
 }
