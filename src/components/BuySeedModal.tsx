@@ -41,7 +41,10 @@ const BuySeedModal = () => {
 
             if (success) {
                 setStatus('success')
-                debounce(onClose, 3500)();
+                debounce(() => {
+                    onClose();
+                    setStatus('initial');
+                }, 3500)();
             } else {
                 setStatus('error')
             }
