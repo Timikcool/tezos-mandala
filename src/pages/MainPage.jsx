@@ -92,6 +92,7 @@ const MainPage = () => {
                   left={`${stage * 5}%`}
                   w="1px"
                   background="black"
+                  key={stage.toString()}
                 />
               ))}
               <Flex
@@ -120,7 +121,7 @@ const MainPage = () => {
               justifyContent="space-around"
             >
               {range(1, 21).map((stage) => (
-                <Flex className={`stage-${stage}-price`} marginLeft="12px">
+                <Flex className={`stage-${stage}-price`} marginLeft="12px" key={stage.toString()} >
                   <Text
                     fontSize="xs"
                     visibility={
