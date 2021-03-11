@@ -58,9 +58,6 @@ export const AppProvider: React.FC = ({ children }) => {
     const buySeed = useCallback(async () => {
         setBuyingSeed(true);
         try {
-            // starting_price + (id / 100) * price_step;
-            // starting_price = 1tz
-            // price_step = 2tz
             const storage = await getContractStorage(config.contract);
             const startingPrice = tzToMutez(5);
             const priceStep = tzToMutez(5);
@@ -68,11 +65,8 @@ export const AppProvider: React.FC = ({ children }) => {
             const price = tzToMutez(getPriceFromId(id));
             console.log({ price, id, priceStep, startingPrice });
 
-            const op = await contract.methods.buy(1).send({ amount: 10000000, mutez: true });
+            const op = await contract.methods.buy(1).send({ amount: price, mutez: true });
             await op.confirmation();
-            // const newStorage: any = await contract.storage();
-            // if (newStorage) setStorage(newStorage.toNumber());
-            // setUserBalance((await Tezos.tz.getBalance(userAddress)).toNumber());
             setBuyingSeed(false);
             return true;
         } catch (error) {
@@ -120,7 +114,7 @@ export const AppProvider: React.FC = ({ children }) => {
         try {
             const wallet = new BeaconWallet({
                 name: "Tezos Mandala",
-                preferredNetwork: NetworkType.EDONET,
+                preferredNetwork: config.networkType as NetworkType,
                 disableDefaultEvents: true, // Disable all events / UI. This also disables the pairing alert.
                 eventHandlers: {
                     // To keep the pairing alert, we have to add the following default event handlers back
@@ -135,8 +129,8 @@ export const AppProvider: React.FC = ({ children }) => {
             Tezos.setWalletProvider(wallet);
             await wallet.requestPermissions({
                 network: {
-                    type: NetworkType.EDONET,
-                    rpcUrl: "https://edonet.smartpy.io"
+                    type: config.networkType as NetworkType,
+                    rpcUrl: config.rpc
                 }
             });
             setWallet(wallet);
@@ -154,7 +148,7 @@ export const AppProvider: React.FC = ({ children }) => {
         if (wallet === null) {
             const newWallet = new BeaconWallet({
                 name: 'Tezos Mandala',
-                preferredNetwork: NetworkType.EDONET,
+                preferredNetwork: config.networkType as NetworkType,
                 eventHandlers: {
                     // To keep the pairing alert, we have to add the following default event handlers back
                     [BeaconEvent.PAIR_INIT]: {
@@ -183,8 +177,8 @@ export const AppProvider: React.FC = ({ children }) => {
             if (forceConnect) {
                 await wallet.requestPermissions({
                     network: {
-                        type: NetworkType.EDONET,
-                        rpcUrl: "https://edonet.smartpy.io"
+                        type: config.networkType as NetworkType,
+                        rpcUrl: config.rpc
                     }
                 });
             } else {

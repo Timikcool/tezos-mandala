@@ -11,6 +11,7 @@ import { getContractStorage } from "../service/bcd";
 import { useApp } from "../state/app";
 import config from "../config";
 import selectObjectByKeys from "../utils/selectObjectByKeys";
+import { getPriceFromId } from "../utils/price";
 
 // const scrollToCreateMandala = document
 //   .querySelector("#create-mandala")
@@ -120,7 +121,12 @@ const MainPage = () => {
             >
               {range(1, 21).map((stage) => (
                 <Flex className={`stage-${stage}-price`} marginLeft="12px">
-                  <Text fontSize="xs">{`${stage * 5}tz`}</Text>
+                  <Text
+                    fontSize="xs"
+                    visibility={
+                      getPriceFromId(nextId) === stage * 5 ? "show" : "hidden"
+                    }
+                  >{`${stage * 5}tz`}</Text>
                 </Flex>
               ))}
             </Box>

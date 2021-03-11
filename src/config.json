@@ -3,6 +3,8 @@
         "api": "https://api.better-call.dev"
     },
     "network": "edo2net",
+    "networkType": "edonet",
+    "rpc": "https://edonet.smartpy.io",
     "contract": "KT1PtfkoEhhz1bbZJq5SLJmorxdQGTd5XpdF",
     "tokenService": "https://tezos-mandala.art"
 }
