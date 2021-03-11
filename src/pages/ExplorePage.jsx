@@ -8,6 +8,7 @@ import { getBigMapKeys, getContractStorage } from "../service/bcd";
 import config from "../config.json";
 import selectObjectByKeys from "../utils/selectObjectByKeys";
 import MandalaCard from "../components/MandalaCard";
+import { processMandalas } from "../utils/data";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
@@ -37,6 +38,10 @@ export const ExplorePage = () => {
     setLoading(true);
     try {
       const storage = await getContractStorage(config.contract);
+      const metadataMapId = selectObjectByKeys(storage, {
+        type: "big_map",
+        name: "metadata",
+      })?.value;
       const tokensMapId = selectObjectByKeys(storage, {
         type: "big_map",
         name: "token_metadata",
@@ -45,37 +50,15 @@ export const ExplorePage = () => {
         type: "big_map",
         name: "ledger",
       })?.value;
-      const [tokens, owners] = await Promise.all([
+      const [tokens, owners, metadata] = await Promise.all([
         getBigMapKeys(tokensMapId, 2000),
         getBigMapKeys(ownersMapId, 2000),
+        getBigMapKeys(metadataMapId, 2000),
       ]);
 
-      const totalMandalas = tokens.reduce((acc, token) => {
-        //   const id = selectObjectByKeys(token, {type:'nat', name:'key'})
-        const id = token.data.key_string;
-        if (id === "0") return acc;
+      console.log({ metadata });
 
-        const timestamp = token.data.timestamp;
-        const rarity = selectObjectByKeys(token.data.value, {
-          type: "bytes",
-          name: "name",
-        })?.value?.replace(/['"]+/g, "");
-        const hash = token.data.key_hash;
-        const owner = owners.find(
-          (owner) =>
-            selectObjectByKeys(owner.data.key, {
-              type: "nat",
-              name: "token_id",
-            })?.value === id
-        );
-        const ownerAddress = selectObjectByKeys(owner?.data.key, {
-          type: "address",
-          name: "owner",
-        }).value;
-
-        return [...acc, { id, timestamp, rarity, hash, ownerAddress }];
-      }, []);
-
+      const totalMandalas = processMandalas(tokens, owners, metadata);
       // const keys = await get;
       console.log({ storage, tokens, owners, totalMandalas });
       setTotalMandalas(totalMandalas);

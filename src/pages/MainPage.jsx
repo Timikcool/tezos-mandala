@@ -182,14 +182,7 @@ const MainPage = () => {
             </Text>
 
             <Flex w="100%" justify="center">
-              <Button
-                variant="outline"
-                colorScheme="black"
-                border="none"
-                onClick={handleGetMandala}
-              >
-                Get Mandala
-              </Button>
+              <BuySeedModal />
             </Flex>
           </VStack>
         </VStack>

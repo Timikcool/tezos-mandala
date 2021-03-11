@@ -9,6 +9,7 @@ import config from "../config.json";
 import selectObjectByKeys from "../utils/selectObjectByKeys";
 import MandalaCard from "../components/MandalaCard";
 import { useApp } from "../state/app";
+import { processMandalas } from "../utils/data";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
@@ -49,38 +50,20 @@ export const MyCollectionPage = () => {
           type: "big_map",
           name: "ledger",
         })?.value;
-        const [tokens, owners] = await Promise.all([
+
+        const metadataMapId = selectObjectByKeys(storage, {
+          type: "big_map",
+          name: "metadata",
+        })?.value;
+        const [tokens, owners, metadata] = await Promise.all([
           getBigMapKeys(tokensMapId, 2000),
           getBigMapKeys(ownersMapId, 2000),
+          getBigMapKeys(metadataMapId, 2000),
         ]);
 
-        const totalMandalas = tokens.reduce((acc, token) => {
-          //   const id = selectObjectByKeys(token, {type:'nat', name:'key'})
-          const id = token.data.key_string;
-          if (id === "0") return acc;
-
-          const timestamp = token.data.timestamp;
-          const rarity = selectObjectByKeys(token.data.value, {
-            type: "bytes",
-            name: "name",
-          })?.value?.replace(/['"]+/g, "");
-          const hash = token.data.key_hash;
-          const owner = owners.find(
-            (owner) =>
-              selectObjectByKeys(owner.data.key, {
-                type: "nat",
-                name: "token_id",
-              })?.value === id
-          );
-          const ownerAddress = selectObjectByKeys(owner?.data.key, {
-            type: "address",
-            name: "owner",
-          }).value;
-
-          if (ownerAddress !== userAddress) return acc;
-
-          return [...acc, { id, timestamp, rarity, hash, ownerAddress }];
-        }, []);
+        const totalMandalas = processMandalas(tokens, owners, metadata).filter(
+          (mandala) => mandala.ownerAddress === userAddress
+        );
 
         // const keys = await get;
         console.log({ storage, tokens, owners, totalMandalas });

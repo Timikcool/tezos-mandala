@@ -11,6 +11,9 @@ import config from '../config.json';
 import { getContractStorage } from '../service/bcd';
 import selectObjectByKeys from '../utils/selectObjectByKeys';
 import { tzToMutez } from '../utils/mutez';
+import { getPriceFromId } from '../utils/price';
+import axios from 'axios';
+import tokenServiceResponse from './token_service_response.json'
 
 export enum BeaconConnection {
     NONE = "",
@@ -62,7 +65,7 @@ export const AppProvider: React.FC = ({ children }) => {
             const startingPrice = tzToMutez(5);
             const priceStep = tzToMutez(5);
             const id = parseInt(selectObjectByKeys(storage, { type: 'nat', name: "next_id" })?.value) - 1;
-            const price = tzToMutez(5 + (id / 100) * 5);
+            const price = tzToMutez(getPriceFromId(id));
             console.log({ price, id, priceStep, startingPrice });
 
             const op = await contract.methods.buy(1).send({ amount: 10000000, mutez: true });
@@ -79,20 +82,23 @@ export const AppProvider: React.FC = ({ children }) => {
         }
     }, [contract]);
 
-    const convertSeed = async (id): Promise<void> => {
+    const convertSeed = useCallback(async (id): Promise<boolean> => {
         setConvertingSeed(true);
         try {
-            const op = await contract.methods.render(1).send();
+            //  TODO: request for bytes and signature
+
+            const response = await axios.get(`${config.tokenService}/json/${id}`);
+            const { seed, data, signature } = response.data;
+            const op = await contract.methods.render(id, data, signature).send();
             await op.confirmation();
-            const newStorage: any = await contract.storage();
-            if (newStorage) setStorage(newStorage.toNumber());
-            setUserBalance((await Tezos.tz.getBalance(userAddress)).toNumber());
+            setConvertingSeed(false);
+            return true;
         } catch (error) {
             console.log(error);
         } finally {
             setConvertingSeed(false);
         }
-    };
+    }, [contract]);
 
 
 
@@ -113,7 +119,7 @@ export const AppProvider: React.FC = ({ children }) => {
         setConnectingWallet(true);
         try {
             const wallet = new BeaconWallet({
-                name: "Taquito Boilerplate",
+                name: "Tezos Mandala",
                 preferredNetwork: NetworkType.EDONET,
                 disableDefaultEvents: true, // Disable all events / UI. This also disables the pairing alert.
                 eventHandlers: {
@@ -147,7 +153,7 @@ export const AppProvider: React.FC = ({ children }) => {
     const getWallet = () => {
         if (wallet === null) {
             const newWallet = new BeaconWallet({
-                name: 'OpenSystem dApp',
+                name: 'Tezos Mandala',
                 preferredNetwork: NetworkType.EDONET,
                 eventHandlers: {
                     // To keep the pairing alert, we have to add the following default event handlers back
@@ -223,6 +229,7 @@ export const AppProvider: React.FC = ({ children }) => {
 
 
     let v = {
+        convertSeed,
         reconnectWallet,
         disconnectWallet,
         connectWallet,
