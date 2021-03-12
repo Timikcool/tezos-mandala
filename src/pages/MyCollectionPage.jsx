@@ -2,7 +2,7 @@ import { Flex, HStack, Text, VStack, Wrap, WrapItem } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
 import { Spinner } from "@chakra-ui/spinner";
 import { orderBy, sortBy, startCase } from "lodash";
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
 import RaritySelector from "../components/RaritySelector";
 import { getBigMapKeys, getContractStorage } from "../service/bcd";
 import config from "../config.json";
@@ -37,7 +37,9 @@ export const MyCollectionPage = () => {
 
   const { userAddress } = useApp();
 
-  const getStorage = async () => {
+  useEffect(() => getStorage(), [userAddress]);
+
+  const getStorage = useCallback(async () => {
     if (userAddress) {
       setLoading(true);
       try {
@@ -74,9 +76,11 @@ export const MyCollectionPage = () => {
         setLoading(false);
       }
     }
-  };
+  }, [userAddress]);
 
-  useEffect(() => getStorage(), [userAddress]);
+  const onConvert = useCallback(() => {
+    getStorage();
+  }, [getStorage]);
 
   useEffect(() => {
     // * filter mandalas by filter
@@ -144,7 +148,7 @@ export const MyCollectionPage = () => {
           <Wrap spacing="30px" justify="center" w="100%">
             {filteredMandalas.map((mandala) => (
               <WrapItem>
-                <MandalaCard mandala={mandala} />
+                <MandalaCard mandala={mandala} onConvert={onConvert} />
               </WrapItem>
             ))}
           </Wrap>

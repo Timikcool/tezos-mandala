@@ -21,7 +21,7 @@ const decodeHexToSvg = (hexString: string) => {
     return dec.decode(pako.ungzip(bytes))
 }
 
-const MandalaCard = ({ mandala }) => {
+const MandalaCard = ({ mandala, onConvert = () => { } }) => {
     const { userAddress, convertSeed } = useApp();
     const [status, setStatus] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -39,8 +39,12 @@ const MandalaCard = ({ mandala }) => {
         try {
             const success = await convertSeed(mandala.id);
             if (success) {
-                setStatus('success')
-                debounce(onClose, 3500)();
+                setStatus('success');
+                onConvert();
+                debounce(() => {
+                    onClose();
+                    setStatus(null);
+                }, 3500)();
             } else {
                 setStatus('error')
             }
