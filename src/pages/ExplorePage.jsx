@@ -2,7 +2,7 @@ import { Flex, HStack, Text, VStack, Wrap, WrapItem } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
 import { Spinner } from "@chakra-ui/spinner";
 import { orderBy, sortBy, startCase } from "lodash";
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
 import RaritySelector from "../components/RaritySelector";
 import { getBigMapKeys, getContractStorage } from "../service/bcd";
 import config from "../config.json";
@@ -37,50 +37,55 @@ export const ExplorePage = () => {
   const [sort, setSort] = useState("new");
   const { subscriber } = useApp();
 
-  const getStorage = async (toggleLoading = true) => {
-    toggleLoading && setLoading(true);
-    try {
-      const storage = await getContractStorage(config.contract);
-      const metadataMapId = selectObjectByKeys(storage, {
-        type: "big_map",
-        name: "metadata",
-      })?.value;
-      const tokensMapId = selectObjectByKeys(storage, {
-        type: "big_map",
-        name: "token_metadata",
-      })?.value;
-      const ownersMapId = selectObjectByKeys(storage, {
-        type: "big_map",
-        name: "ledger",
-      })?.value;
-      const [tokens, owners, metadata] = await Promise.all([
-        getBigMapKeys(tokensMapId, 2000),
-        getBigMapKeys(ownersMapId, 2000),
-        getBigMapKeys(metadataMapId, 2000),
-      ]);
+  const getStorage = useCallback(
+    async (toggleLoading = true) => {
+      toggleLoading && setLoading(true);
+      try {
+        const storage = await getContractStorage(config.contract);
+        const metadataMapId = selectObjectByKeys(storage, {
+          type: "big_map",
+          name: "metadata",
+        })?.value;
+        const tokensMapId = selectObjectByKeys(storage, {
+          type: "big_map",
+          name: "token_metadata",
+        })?.value;
+        const ownersMapId = selectObjectByKeys(storage, {
+          type: "big_map",
+          name: "ledger",
+        })?.value;
+        const [tokens, owners, metadata] = await Promise.all([
+          getBigMapKeys(tokensMapId, 2000),
+          getBigMapKeys(ownersMapId, 2000),
+          getBigMapKeys(metadataMapId, 2000),
+        ]);
 
-      console.log({ metadata });
+        console.log({ metadata });
 
-      const totalMandalas = processMandalas(tokens, owners, metadata);
-      // const keys = await get;
-      console.log({ storage, tokens, owners, totalMandalas });
-      setTotalMandalas(totalMandalas);
-      toggleLoading && setLoading(false);
-    } catch (error) {
-      console.log(error);
-      toggleLoading && setLoading(false);
-    }
-  };
+        const totalMandalas = processMandalas(tokens, owners, metadata);
+        // const keys = await get;
+        console.log({ storage, tokens, owners, totalMandalas });
+        setTotalMandalas(totalMandalas);
+        toggleLoading && setLoading(false);
+      } catch (error) {
+        console.log(error);
+        toggleLoading && setLoading(false);
+      }
+    },
+    [setLoading, setTotalMandalas]
+  );
 
   useEffect(() => {
     getStorage();
     subscriber.on("data", (transaction) => {
-      // transaction.source
+      // * update on events
       if (["buy", "render"].includes(transaction?.parameters?.entrypoint)) {
         getStorage(false);
       }
     });
-  }, []);
+    const interval = setInterval(() => getStorage(false), 15000);
+    return () => clearInterval(interval);
+  }, [getStorage]);
 
   useEffect(() => {
     // * filter mandalas by filter
@@ -147,7 +152,7 @@ export const ExplorePage = () => {
 
           <Wrap spacing="30px" justify="center" w="100%">
             {filteredMandalas.map((mandala) => (
-              <WrapItem>
+              <WrapItem key={mandala.id}>
                 <MandalaCard mandala={mandala} />
               </WrapItem>
             ))}

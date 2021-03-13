@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/layout";
 import { Button, IconButton, Img } from "@chakra-ui/react";
 import { range } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { HashLink } from "react-router-hash-link";
 import BuySeedModal from "../components/BuySeedModal";
 
@@ -48,14 +48,15 @@ const MainPage = () => {
   const [nextId, setNextId] = useState(1);
   const { subscriber } = useApp();
 
-  const getCurrentPosition = async () => {
+  const getCurrentPosition = useCallback(async () => {
     const storage = await getContractStorage(config.contract);
     const nextId = selectObjectByKeys(storage, {
       type: "nat",
       name: "next_id",
     })?.value;
     setNextId(parseInt(nextId || 2) - 1);
-  };
+  }, [setNextId]);
+
   useEffect(() => {
     getCurrentPosition();
     subscriber.on("data", (transaction) => {
@@ -63,7 +64,9 @@ const MainPage = () => {
         getCurrentPosition();
       }
     });
-  }, []);
+    const interval = setInterval(() => getCurrentPosition(), 15000);
+    return () => clearInterval(interval);
+  }, [getCurrentPosition]);
   return (
     <VStack maxW="100%" spacing={16}>
       <Flex h="calc(100vh - 104px)" align="center">

@@ -39,25 +39,6 @@ export const MyCollectionPage = () => {
 
   const { userAddress, connectWallet, subscriber } = useApp();
 
-  useEffect(() => {
-    if (!userAddress) {
-      connectWallet();
-    } else {
-      subscriber.on("data", (transaction) => {
-        // transaction.source
-        if (
-          ["buy", "render", "rename"].includes(
-            transaction?.parameters?.entrypoint
-          ) &&
-          transaction.source === userAddress
-        ) {
-          getStorage(false);
-        }
-      });
-    }
-    getStorage();
-  }, [userAddress]);
-
   const getStorage = useCallback(
     async (toggleLoading = true) => {
       if (userAddress) {
@@ -99,11 +80,31 @@ export const MyCollectionPage = () => {
         }
       }
     },
-    [userAddress]
+    [userAddress, setLoading]
   );
 
-  const onConvert = useCallback(() => {
-    getStorage(false);
+  useEffect(() => {
+    if (!userAddress) {
+      connectWallet();
+    } else {
+      subscriber.on("data", (transaction) => {
+        // transaction.source
+        if (
+          ["buy", "render", "rename"].includes(
+            transaction?.parameters?.entrypoint
+          ) &&
+          transaction.source === userAddress
+        ) {
+          getStorage(false);
+        }
+      });
+    }
+  }, [userAddress]);
+
+  useEffect(() => {
+    getStorage();
+    const interval = setInterval(() => getStorage(false), 15000);
+    return () => clearInterval(interval);
   }, [getStorage]);
 
   useEffect(() => {
@@ -181,8 +182,8 @@ export const MyCollectionPage = () => {
 
           <Wrap spacing="30px" justify="center" w="100%">
             {filteredMandalas.map((mandala) => (
-              <WrapItem>
-                <MandalaCard mandala={mandala} onConvert={onConvert} />
+              <WrapItem key={mandala.id}>
+                <MandalaCard mandala={mandala} />
               </WrapItem>
             ))}
           </Wrap>

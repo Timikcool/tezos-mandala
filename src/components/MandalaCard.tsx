@@ -17,6 +17,7 @@ import axios from 'axios';
 import { useApp } from '../state/app';
 // import { saveSvgAsPng } from 'save-svg-as-png';
 import Canvg, { presets, RenderingContext2D } from 'canvg';
+import { useToast } from '@chakra-ui/toast';
 
 const decodeHexToSvg = (hexString: string) => {
     let packed = hexString;
@@ -37,11 +38,11 @@ const savePng = async (svg: string, name: string) => {
     saveAs(blob, `${name}.png`);
 }
 
-const MandalaCard = ({ mandala, onConvert = () => { } }) => {
+const MandalaCard = ({ mandala }) => {
     const { contract, userAddress } = useApp()
     const [status, setStatus] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
-
+    const toast = useToast();
     const isSeed = mandala.rarity === 'Seed';
     const userOwns = mandala.ownerAddress === userAddress
 
@@ -56,15 +57,19 @@ const MandalaCard = ({ mandala, onConvert = () => { } }) => {
             const response = await axios.get(`${config.tokenService}/json/${mandala.id}`);
             const { data, signature } = response.data;
             const op = await contract.methods.render(mandala.id, data, signature).send();
-            await op.confirmation();
-
             setStatus('success');
-            onConvert();
             debounce(() => {
                 onClose();
                 setStatus(null);
-            }, 3500)();
-
+            }, 5000)();
+            await op.confirmation();
+            toast({
+                title: "Mandala created from Seed",
+                description: "It will be updated in My Collection tab in a minute",
+                status: "success",
+                duration: 3500,
+                isClosable: true,
+            });
 
         } catch (error) {
             setStatus('error')
@@ -153,7 +158,7 @@ const MandalaCard = ({ mandala, onConvert = () => { } }) => {
                                     Success!
                             </AlertTitle>
                                 <AlertDescription maxWidth="sm">
-                                    Your Mandala will appear at My Collection tab in a minute
+                                    Your transaction sent successfully. Mandala will appear at My Collection tab after confirmation.
                             </AlertDescription>
                             </Alert>)
                         }
