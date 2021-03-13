@@ -25,6 +25,7 @@ import exampleMandala3 from "../assets/img/example-mandala-3.svg";
 import exampleMandala4 from "../assets/img/example-mandala-4.svg";
 import exampleMandala5 from "../assets/img/example-mandala-5.svg";
 import exampleMandala6 from "../assets/img/example-mandala-6.svg";
+import { useApp } from "../state/app";
 
 const exampleMandalas = [
   exampleMandala1,
@@ -45,6 +46,7 @@ const MainPage = () => {
   //     ?.scrollIntoView({ behavior: "smooth" });
 
   const [nextId, setNextId] = useState(1);
+  const { subscriber } = useApp();
 
   const getCurrentPosition = async () => {
     const storage = await getContractStorage(config.contract);
@@ -56,8 +58,11 @@ const MainPage = () => {
   };
   useEffect(() => {
     getCurrentPosition();
-    const interval = setInterval(getCurrentPosition, 10000);
-    return () => clearInterval(interval);
+    subscriber.on("data", (transaction) => {
+      if (["buy"].includes(transaction?.parameters?.entrypoint)) {
+        getCurrentPosition();
+      }
+    });
   }, []);
   return (
     <VStack maxW="100%" spacing={16}>

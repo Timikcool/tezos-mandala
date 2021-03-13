@@ -37,40 +37,25 @@ export const MyCollectionPage = () => {
   const [totalMandalas, setTotalMandalas] = useState([]);
   const [sort, setSort] = useState("new");
 
-  const { userAddress, connectWallet } = useApp();
-
-  const connectToStorage = async () => {
-    const connection = new HubConnectionBuilder()
-      .withUrl("https://api.tzkt.io/v1/events")
-      .build();
-
-    async function init() {
-      // open connection
-      await connection.start();
-      // subscribe to head
-
-      await connection.invoke("SubscribeToOperations", {
-        address: config.contract,
-        types: "transaction",
-      });
-    }
-
-    // auto-reconnect
-    connection.onclose(init);
-
-    connection.on("operations", (msg) => {
-      getStorage(false);
-    });
-
-    init();
-  };
+  const { userAddress, connectWallet, subscriber } = useApp();
 
   useEffect(() => {
     if (!userAddress) {
       connectWallet();
+    } else {
+      subscriber.on("data", (transaction) => {
+        // transaction.source
+        if (
+          ["buy", "render", "rename"].includes(
+            transaction?.parameters?.entrypoint
+          ) &&
+          transaction.source === userAddress
+        ) {
+          getStorage(false);
+        }
+      });
     }
     getStorage();
-    connectToStorage();
   }, [userAddress]);
 
   const getStorage = useCallback(

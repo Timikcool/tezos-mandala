@@ -16,6 +16,7 @@ import axios from 'axios';
 import tokenServiceResponse from './token_service_response.json'
 
 
+
 export enum BeaconConnection {
     NONE = "",
     LISTENING = "Listening to P2P channel",
@@ -29,7 +30,9 @@ export enum BeaconConnection {
 
 const AppContext = React.createContext<any>(undefined)
 const Tezos = new TezosToolkit(config.rpc);
-
+const subscriber = Tezos.stream.subscribeOperation({ destination: config.contract })
+subscriber.on("error", console.log);
+// subscriber.on("data", console.log);
 // create the context provider, we are using use state to ensure that
 // we get reactive values from the context...
 export const AppProvider: React.FC = ({ children }) => {
@@ -227,7 +230,8 @@ export const AppProvider: React.FC = ({ children }) => {
         buySeed,
         userAddress,
         wallet,
-        contract
+        contract,
+        subscriber
     }
 
     return <AppContext.Provider value={v}>{children}</AppContext.Provider>

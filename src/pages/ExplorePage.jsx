@@ -10,6 +10,7 @@ import selectObjectByKeys from "../utils/selectObjectByKeys";
 import MandalaCard from "../components/MandalaCard";
 import { processMandalas } from "../utils/data";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+import { useApp } from "../state/app";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
@@ -34,6 +35,7 @@ export const ExplorePage = () => {
   const [filteredMandalas, setFilteredMandalas] = useState([]);
   const [totalMandalas, setTotalMandalas] = useState([]);
   const [sort, setSort] = useState("new");
+  const { subscriber } = useApp();
 
   const getStorage = async (toggleLoading = true) => {
     toggleLoading && setLoading(true);
@@ -70,36 +72,14 @@ export const ExplorePage = () => {
     }
   };
 
-  const connectToStorage = async () => {
-    const connection = new HubConnectionBuilder()
-      .withUrl("https://api.tzkt.io/v1/events")
-      .build();
-
-    async function init() {
-      // open connection
-      await connection.start();
-      // subscribe to head
-
-      await connection.invoke("SubscribeToOperations", {
-        address: config.contract,
-        types: "transaction",
-      });
-    }
-
-    // auto-reconnect
-    connection.onclose(init);
-
-    connection.on("operations", (msg) => {
-      getStorage(false);
-    });
-
-    init();
-    return connection;
-  };
-
   useEffect(() => {
     getStorage();
-    connectToStorage();
+    subscriber.on("data", (transaction) => {
+      // transaction.source
+      if (["buy", "render"].includes(transaction?.parameters?.entrypoint)) {
+        getStorage(false);
+      }
+    });
   }, []);
 
   useEffect(() => {
