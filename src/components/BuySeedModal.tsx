@@ -14,18 +14,25 @@ import {
     AlertIcon,
     AlertTitle,
     AlertDescription,
-    Spinner
+    Spinner,
+    useToast
 } from "@chakra-ui/react"
 import { debounce } from "lodash";
-
-import React, { useEffect, useState } from 'react'
+import config from '../config.json';
+import React, { useCallback, useEffect, useState } from 'react'
+import { getContractStorage } from "../service/bcd";
 import { useApp } from "../state/app";
+import selectObjectByKeys from "../utils/selectObjectByKeys";
+import { tzToMutez } from "../utils/mutez";
+import { getPriceFromId } from "../utils/price";
 
 
 const BuySeedModal = () => {
+    const toast = useToast();
     const [status, setStatus] = useState<'initial' | 'processing' | 'error' | 'success'>('initial')
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { connectWallet, buySeed, wallet } = useApp();
+    const { connectWallet, wallet, contract } = useApp()
+
     const handleGetMandala = async () => {
         if (!wallet) {
             await connectWallet();
@@ -37,18 +44,27 @@ const BuySeedModal = () => {
     const handleBuy = async () => {
         try {
             setStatus('processing');
-            const success = await buySeed();
+            const storage = await getContractStorage(config.contract);
+            const id = parseInt(selectObjectByKeys(storage, { type: 'nat', name: "next_id" })?.value) - 1;
+            const price = tzToMutez(getPriceFromId(id));
+            const op = await contract.methods.buy(1).send({ amount: price, mutez: true });
+            setStatus('success')
+            debounce(() => {
+                onClose();
+                setStatus('initial');
+            }, 5000)();
+            await op.confirmation()
+            toast({
+                title: "Seed created",
+                description: "It's avaliable in My Collection tab",
+                status: "success",
+                duration: 3500,
+                isClosable: true,
+            })
 
-            if (success) {
-                setStatus('success')
-                debounce(() => {
-                    onClose();
-                    setStatus('initial');
-                }, 3500)();
-            } else {
-                setStatus('error')
-            }
         } catch (error) {
+            console.log(error);
+
             setStatus('error')
         }
     }
@@ -115,7 +131,7 @@ const BuySeedModal = () => {
                                     Success!
                             </AlertTitle>
                                 <AlertDescription maxWidth="sm">
-                                    Your Mandala Seed will appear at My Collection tab in a minute
+                                    Your transaction successfuly sent. Mandala Seed will appear at My Collection tab after confirmation.
                             </AlertDescription>
                             </Alert>)
                         }

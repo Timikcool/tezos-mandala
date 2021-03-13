@@ -1,17 +1,22 @@
 import { Button } from '@chakra-ui/button';
-import { Flex, Text, Box, VStack } from '@chakra-ui/layout';
+import { Flex, Text, Box, VStack, Link } from '@chakra-ui/layout';
 import React, { useState } from 'react'
-import { useApp } from '../state/app';
+// import { useApp } from '../state/app';
 import sampleMandala from '../assets/img/sample-mandala.svg'
 import { Image } from '@chakra-ui/image';
 import { getPriceFromId } from '../utils/price';
 import pako from 'pako';
+import config from '../config.json';
 import { saveAs } from 'file-saver';
 import { Alert, AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/alert';
 import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from '@chakra-ui/modal';
 import { Spinner } from '@chakra-ui/spinner';
 import { debounce } from 'lodash';
 import { useDisclosure } from '@chakra-ui/hooks';
+import axios from 'axios';
+import { useApp } from '../state/app';
+// import { saveSvgAsPng } from 'save-svg-as-png';
+import Canvg, { presets, RenderingContext2D } from 'canvg';
 
 const decodeHexToSvg = (hexString: string) => {
     let packed = hexString;
@@ -21,11 +26,21 @@ const decodeHexToSvg = (hexString: string) => {
     return dec.decode(pako.ungzip(bytes))
 }
 
+const savePng = async (svg: string, name: string) => {
+    const canvas = new OffscreenCanvas(500, 500);
+    const ctx = canvas.getContext('2d') as RenderingContext2D;
+    const v = await Canvg.from(ctx, svg, presets.offscreen());
+
+    // Render only first frame, ignoring animations and mouse.
+    await v.render();
+    const blob = await canvas.convertToBlob();
+    saveAs(blob, `${name}.png`);
+}
+
 const MandalaCard = ({ mandala, onConvert = () => { } }) => {
-    const { userAddress, convertSeed } = useApp();
+    const { contract, userAddress } = useApp()
     const [status, setStatus] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
-    console.log({ mandala });
 
     const isSeed = mandala.rarity === 'Seed';
     const userOwns = mandala.ownerAddress === userAddress
@@ -36,18 +51,20 @@ const MandalaCard = ({ mandala, onConvert = () => { } }) => {
     const handleCreateMandala = async () => {
         setStatus('processing')
         onOpen();
+
         try {
-            const success = await convertSeed(mandala.id);
-            if (success) {
-                setStatus('success');
-                onConvert();
-                debounce(() => {
-                    onClose();
-                    setStatus(null);
-                }, 3500)();
-            } else {
-                setStatus('error')
-            }
+            const response = await axios.get(`${config.tokenService}/json/${mandala.id}`);
+            const { data, signature } = response.data;
+            const op = await contract.methods.render(mandala.id, data, signature).send();
+            await op.confirmation();
+
+            setStatus('success');
+            onConvert();
+            debounce(() => {
+                onClose();
+                setStatus(null);
+            }, 3500)();
+
 
         } catch (error) {
             setStatus('error')
@@ -69,8 +86,8 @@ const MandalaCard = ({ mandala, onConvert = () => { } }) => {
     }
 
     const handleDownload = () => {
-        const blob = new Blob([svg], { type: "image/svg+xml" });
-        saveAs(blob, `${mandala.name}.svg`);
+        savePng(svg, mandala.name)
+
     }
     return (
         <>
@@ -91,15 +108,15 @@ const MandalaCard = ({ mandala, onConvert = () => { } }) => {
                 </Flex>
 
                 <Flex w="100%" justify="center" h="40px" padding="8px">
-                    {mandala.name && mandala.name !== "Seed" && <Text isTruncated>{mandala.name}</Text>}
+                    {mandala.name && mandala.name !== "Seed" && <Text isTruncated fontSize="12px">{mandala.name}</Text>}
                 </Flex>
                 <Flex padding="8px" minH="48px" justify="space-between" align="center">
                     <Text fontSize="sm" fontWeight="500">
-                        {`${getPriceFromId(mandala.id)}tz`}
+                        {`${getPriceFromId(mandala.id)} tez`}
                     </Text>
                     {showConvertButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleCreateMandala}>Create Mandala</Button>}
                     {showDownloadButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleDownload} variant="mandala-card">Download</Button>}
-                    {!userOwns && <Text fontSize="xs" w="50%" isTruncated >{mandala.ownerAddress}</Text>}
+                    {!userOwns && <a style={{ width: '50%' }} target="_blank" rel="noreferrer noopener" href={`https://better-call.dev/${config.network}/${mandala.ownerAddress}/`}> <Text fontSize="xs" isTruncated>{mandala.ownerAddress}</Text> </a>}
                 </Flex>
             </Flex>
             <Modal isOpen={isOpen} onClose={onClose} isCentered closeOnOverlayClick={status !== 'processing'} closeOnEsc={status !== 'processing'}>

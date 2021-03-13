@@ -15,6 +15,7 @@ import { getPriceFromId } from '../utils/price';
 import axios from 'axios';
 import tokenServiceResponse from './token_service_response.json'
 
+
 export enum BeaconConnection {
     NONE = "",
     LISTENING = "Listening to P2P channel",
@@ -27,15 +28,15 @@ export enum BeaconConnection {
 // create the context
 
 const AppContext = React.createContext<any>(undefined)
+const Tezos = new TezosToolkit(config.rpc);
 
 // create the context provider, we are using use state to ensure that
 // we get reactive values from the context...
 export const AppProvider: React.FC = ({ children }) => {
     // the reactive values
 
-    const [Tezos, setTezos] = useState<TezosToolkit>(
-        new TezosToolkit("https://edonet.smartpy.io/")
-    );
+
+
     const [contract, setContract] = useState<any>(undefined);
     const [publicToken, setPublicToken] = useState<string | null>("");
     const [connectingWallet, setConnectingWallet] = useState<boolean>(false);
@@ -55,7 +56,7 @@ export const AppProvider: React.FC = ({ children }) => {
     const contractAddress: string = config.contract;
 
     // 
-    const buySeed = useCallback(async () => {
+    const buySeed = useCallback(async (): Promise<void> => {
         setBuyingSeed(true);
         try {
             const storage = await getContractStorage(config.contract);
@@ -65,10 +66,7 @@ export const AppProvider: React.FC = ({ children }) => {
             const price = tzToMutez(getPriceFromId(id));
             console.log({ price, id, priceStep, startingPrice });
 
-            const op = await contract.methods.buy(1).send({ amount: price, mutez: true });
-            await op.confirmation();
-            setBuyingSeed(false);
-            return true;
+            return contract.methods.buy(1).send({ amount: price, mutez: true });
         } catch (error) {
             console.log(error);
         } finally {
@@ -208,8 +206,7 @@ export const AppProvider: React.FC = ({ children }) => {
         setUserAddress("");
         setUserBalance(0);
         setWallet(null);
-        const tezosTK = new TezosToolkit("https://edonet.smartpy.io");
-        setTezos(tezosTK);
+        const tezosTK = new TezosToolkit(config.rpc);
         setBeaconConnection(false);
         setPublicToken(null);
         console.log("disconnecting wallet");
@@ -229,7 +226,8 @@ export const AppProvider: React.FC = ({ children }) => {
         connectWallet,
         buySeed,
         userAddress,
-        wallet
+        wallet,
+        contract
     }
 
     return <AppContext.Provider value={v}>{children}</AppContext.Provider>

@@ -9,6 +9,7 @@ import config from "../config.json";
 import selectObjectByKeys from "../utils/selectObjectByKeys";
 import MandalaCard from "../components/MandalaCard";
 import { processMandalas } from "../utils/data";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
@@ -34,8 +35,8 @@ export const ExplorePage = () => {
   const [totalMandalas, setTotalMandalas] = useState([]);
   const [sort, setSort] = useState("new");
 
-  const getStorage = async () => {
-    setLoading(true);
+  const getStorage = async (toggleLoading = true) => {
+    toggleLoading && setLoading(true);
     try {
       const storage = await getContractStorage(config.contract);
       const metadataMapId = selectObjectByKeys(storage, {
@@ -62,14 +63,44 @@ export const ExplorePage = () => {
       // const keys = await get;
       console.log({ storage, tokens, owners, totalMandalas });
       setTotalMandalas(totalMandalas);
-      setLoading(false);
+      toggleLoading && setLoading(false);
     } catch (error) {
       console.log(error);
-      setLoading(false);
+      toggleLoading && setLoading(false);
     }
   };
 
-  useEffect(() => getStorage(), []);
+  const connectToStorage = async () => {
+    const connection = new HubConnectionBuilder()
+      .withUrl("https://api.tzkt.io/v1/events")
+      .build();
+
+    async function init() {
+      // open connection
+      await connection.start();
+      // subscribe to head
+
+      await connection.invoke("SubscribeToOperations", {
+        address: config.contract,
+        types: "transaction",
+      });
+    }
+
+    // auto-reconnect
+    connection.onclose(init);
+
+    connection.on("operations", (msg) => {
+      getStorage(false);
+    });
+
+    init();
+    return connection;
+  };
+
+  useEffect(() => {
+    getStorage();
+    connectToStorage();
+  }, []);
 
   useEffect(() => {
     // * filter mandalas by filter
@@ -115,7 +146,8 @@ export const ExplorePage = () => {
               Sort by:
             </Text>
             <Select
-              variant="flushed"
+              variant="unstyled"
+              color="orange.500"
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 setSort(e.target.value)
               }

@@ -1,44 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { TezosToolkit } from "@taquito/taquito";
 import "./App.css";
-import ConnectButton from "./components/ConnectWallet";
-import DisconnectButton from "./components/DisconnectWallet";
-import qrcode from "qrcode-generator";
-import UpdateContract from "./components/UpdateContract";
-import Transfers from "./components/Transfers";
 import Header from "./components/Header";
 import { VStack } from "@chakra-ui/layout";
 import { Container } from "@chakra-ui/layout";
 import { Route, Router, Switch } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import MainPage from "./pages/MainPage";
-import { useApp } from "./state/app";
+// import { useApp } from "./state/app";
 import { ExplorePage } from "./pages/ExplorePage";
 import { MyCollectionPage } from "./pages/MyCollectionPage";
+import { Footer } from "./components/Footer";
 
 const history = createBrowserHistory({});
 
 const App = () => {
 
 
-  const { reconnectWallet } = useApp()
-  useEffect(() => {
-    // reconnectWallet()
-  }, [])
   return (
+    <>
+      <Container maxW="container.lg" minH="100vh">
+        <VStack spacing={16} maxW="100%">
+          <Router history={history}>
+            <Header />
+            <Switch>
+              <Route exact path='/' component={MainPage} />
+              <Route exact path='/explore' component={ExplorePage} />
+              <Route exact path='/my-collection' component={MyCollectionPage} />
+            </Switch>
 
-    <Container maxW="container.lg">
-      <VStack spacing={16} maxW="100%">
-        <Router history={history}>
-          <Header />
-          <Switch>
-            <Route exact path='/' component={MainPage} />
-            <Route exact path='/explore' component={ExplorePage} />
-            <Route exact path='/my-collection' component={MyCollectionPage} />
-          </Switch>
-        </Router>
-      </VStack>
-    </Container>
+          </Router>
+        </VStack>
+      </Container>
+      <Footer />
+    </>
   )
 
   // if (publicToken && (!userAddress || isNaN(userBalance))) {

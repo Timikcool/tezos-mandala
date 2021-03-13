@@ -10,6 +10,8 @@ import selectObjectByKeys from "../utils/selectObjectByKeys";
 import MandalaCard from "../components/MandalaCard";
 import { useApp } from "../state/app";
 import { processMandalas } from "../utils/data";
+import BuySeedModal from "../components/BuySeedModal";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
@@ -35,51 +37,88 @@ export const MyCollectionPage = () => {
   const [totalMandalas, setTotalMandalas] = useState([]);
   const [sort, setSort] = useState("new");
 
-  const { userAddress } = useApp();
+  const { userAddress, connectWallet } = useApp();
 
-  useEffect(() => getStorage(), [userAddress]);
+  const connectToStorage = async () => {
+    const connection = new HubConnectionBuilder()
+      .withUrl("https://api.tzkt.io/v1/events")
+      .build();
 
-  const getStorage = useCallback(async () => {
-    if (userAddress) {
-      setLoading(true);
-      try {
-        const storage = await getContractStorage(config.contract);
-        const tokensMapId = selectObjectByKeys(storage, {
-          type: "big_map",
-          name: "token_metadata",
-        })?.value;
-        const ownersMapId = selectObjectByKeys(storage, {
-          type: "big_map",
-          name: "ledger",
-        })?.value;
+    async function init() {
+      // open connection
+      await connection.start();
+      // subscribe to head
 
-        const metadataMapId = selectObjectByKeys(storage, {
-          type: "big_map",
-          name: "metadata",
-        })?.value;
-        const [tokens, owners, metadata] = await Promise.all([
-          getBigMapKeys(tokensMapId, 2000),
-          getBigMapKeys(ownersMapId, 2000),
-          getBigMapKeys(metadataMapId, 2000),
-        ]);
-
-        const totalMandalas = processMandalas(tokens, owners, metadata).filter(
-          (mandala) => mandala.ownerAddress === userAddress
-        );
-
-        // const keys = await get;
-        console.log({ storage, tokens, owners, totalMandalas });
-        setTotalMandalas(totalMandalas);
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-      }
+      await connection.invoke("SubscribeToOperations", {
+        address: config.contract,
+        types: "transaction",
+      });
     }
+
+    // auto-reconnect
+    connection.onclose(init);
+
+    connection.on("operations", (msg) => {
+      getStorage(false);
+    });
+
+    init();
+  };
+
+  useEffect(() => {
+    if (!userAddress) {
+      connectWallet();
+    }
+    getStorage();
+    connectToStorage();
   }, [userAddress]);
 
+  const getStorage = useCallback(
+    async (toggleLoading = true) => {
+      if (userAddress) {
+        toggleLoading && setLoading(true);
+        try {
+          const storage = await getContractStorage(config.contract);
+          const tokensMapId = selectObjectByKeys(storage, {
+            type: "big_map",
+            name: "token_metadata",
+          })?.value;
+          const ownersMapId = selectObjectByKeys(storage, {
+            type: "big_map",
+            name: "ledger",
+          })?.value;
+
+          const metadataMapId = selectObjectByKeys(storage, {
+            type: "big_map",
+            name: "metadata",
+          })?.value;
+          const [tokens, owners, metadata] = await Promise.all([
+            getBigMapKeys(tokensMapId, 2000),
+            getBigMapKeys(ownersMapId, 2000),
+            getBigMapKeys(metadataMapId, 2000),
+          ]);
+
+          const totalMandalas = processMandalas(
+            tokens,
+            owners,
+            metadata
+          ).filter((mandala) => mandala.ownerAddress === userAddress);
+
+          // const keys = await get;
+          console.log({ storage, tokens, owners, totalMandalas });
+          setTotalMandalas(totalMandalas);
+          toggleLoading && setLoading(false);
+        } catch (error) {
+          console.log(error);
+          toggleLoading && setLoading(false);
+        }
+      }
+    },
+    [userAddress]
+  );
+
   const onConvert = useCallback(() => {
-    getStorage();
+    getStorage(false);
   }, [getStorage]);
 
   useEffect(() => {
@@ -97,7 +136,7 @@ export const MyCollectionPage = () => {
       );
     }
     // * sort mandalas by sort
-  }, [sort, rarityFilter, totalMandalas]);
+  }, [sort, rarityFilter, totalMandalas.length]);
   return (
     <VStack spacing={16} w="100%">
       <Text fontSize="5xl" align="center">
@@ -123,26 +162,36 @@ export const MyCollectionPage = () => {
           </VStack>
 
           <HStack spacing={4} w="100%">
-            <Text fontSize="lg" align="left" fontWeight="300" w="65px">
-              Sort by:
-            </Text>
-            <Select
-              variant="flushed"
-              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                setSort(e.target.value)
-              }
-              w="75px"
-            >
-              <option value="new" key="new">
-                new
-              </option>
-              <option value="rarity" key="rarity">
-                rarity
-              </option>
-              <option value="price" key="price">
-                price
-              </option>
-            </Select>
+            {filteredMandalas.length > 0 ? (
+              <>
+                <Text fontSize="lg" align="left" fontWeight="300" w="65px">
+                  Sort by:
+                </Text>
+                <Select
+                  variant="unstyled"
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                    setSort(e.target.value)
+                  }
+                  color="orange.500"
+                  w="75px"
+                >
+                  <option value="new" key="new">
+                    new
+                  </option>
+                  <option value="rarity" key="rarity">
+                    rarity
+                  </option>
+                  <option value="price" key="price">
+                    price
+                  </option>
+                </Select>
+              </>
+            ) : (
+              <VStack w="100%" spacing={4}>
+                <Text fontSize="xl">No mandalas found :(</Text>
+                <BuySeedModal />
+              </VStack>
+            )}
           </HStack>
 
           <Wrap spacing="30px" justify="center" w="100%">

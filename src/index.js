@@ -3,6 +3,9 @@ import ReactDOM from "react-dom";
 import App from "./App.tsx";
 import * as serviceWorker from "./serviceWorker";
 import { ChakraProvider } from "@chakra-ui/react";
+import { TezosToolkit } from "@taquito/taquito";
+import { TezosContextProvider } from "@tezos-il/tezos-react-hooks";
+import config from "./config.json";
 
 // 1. Import `extendTheme`
 import { extendTheme } from "@chakra-ui/react";
@@ -51,16 +54,22 @@ const theme = extendTheme({
       600: "#FCA311",
     },
   },
+  global: {
+    // styles for the `body`
+    body: {
+      color: "text.500",
+    },
+  },
 });
 
+const tezos = new TezosToolkit(config.rpc);
+
 ReactDOM.render(
-  <React.StrictMode>
-    <AppProvider>
-      <ChakraProvider theme={theme}>
-        <App />
-      </ChakraProvider>
-    </AppProvider>
-  </React.StrictMode>,
+  <AppProvider>
+    <ChakraProvider theme={theme}>
+      <App />
+    </ChakraProvider>
+  </AppProvider>,
   document.getElementById("root")
 );
 
