@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react"
 import { debounce } from "lodash";
 import config from '../config.json';
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { getContractStorage } from "../service/bcd";
 import { useApp } from "../state/app";
 import selectObjectByKeys from "../utils/selectObjectByKeys";
@@ -32,6 +32,7 @@ const BuySeedModal = () => {
     const [status, setStatus] = useState<'initial' | 'processing' | 'error' | 'success'>('initial')
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { connectWallet, wallet, contract } = useApp()
+    const timeoutId = useRef(null);
 
     const handleGetMandala = async () => {
         if (!wallet) {
@@ -41,22 +42,35 @@ const BuySeedModal = () => {
         onOpen();
     };
 
+    useEffect(() => {
+        if (status === 'success') {
+            const newTimeoutId = setTimeout(() => {
+                console.log({ isOpen, status });
+
+                if (isOpen) {
+                    onClose();
+                    setStatus('initial');
+                }
+            }, 5000);
+            timeoutId.current = newTimeoutId
+        } else {
+            clearTimeout(timeoutId.current)
+        }
+    }, [status])
+
     const handleBuy = async () => {
         try {
             setStatus('processing');
             const storage = await getContractStorage(config.contract);
-            const id = parseInt(selectObjectByKeys(storage, { type: 'nat', name: "next_id" })?.value) - 1;
+            const id = parseInt(selectObjectByKeys(storage, { type: 'nat', name: "next_id" })?.value) + 1;
             const price = tzToMutez(getPriceFromId(id));
             const op = await contract.methods.buy(1).send({ amount: price, mutez: true });
             setStatus('success')
-            debounce(() => {
-                onClose();
-                setStatus('initial');
-            }, 5000)();
+
             await op.confirmation()
             toast({
                 title: "Seed created",
-                description: "It's avaliable in My Collection tab",
+                description: "It's avaliable at My Collection tab",
                 status: "success",
                 duration: 3500,
                 isClosable: true,
@@ -86,7 +100,10 @@ const BuySeedModal = () => {
                 Get Mandala
             </Button>
 
-            <Modal isOpen={isOpen} onClose={onClose} isCentered closeOnOverlayClick={status !== 'processing'} closeOnEsc={status !== 'processing'}>
+            <Modal isOpen={isOpen} onClose={() => {
+                setStatus('initial');
+                onClose();
+            }} isCentered closeOnOverlayClick={status !== 'processing'} closeOnEsc={status !== 'processing'}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Buy Mandala Seed</ModalHeader>
@@ -99,6 +116,9 @@ const BuySeedModal = () => {
                         </Text>
                                 <Text>
                                     For conversion go to My Collection and click Create Mandala button on Seed card
+                        </Text>
+                                <Text>
+                                    <Text fontWeight="bold" display="inline">Important:</Text> Please, do not try to send tez directly from your exchange account, this could cause the loss of your seed.
                         </Text>
                             </VStack>)
                         }

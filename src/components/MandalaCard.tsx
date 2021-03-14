@@ -1,6 +1,6 @@
 import { Button } from '@chakra-ui/button';
 import { Flex, Text, Box, VStack, Link } from '@chakra-ui/layout';
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 // import { useApp } from '../state/app';
 import sampleMandala from '../assets/img/sample-mandala.svg'
 import { Image } from '@chakra-ui/image';
@@ -43,6 +43,24 @@ const MandalaCard = ({ mandala }) => {
     const [status, setStatus] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+    const timeoutId = useRef(null);
+
+    useEffect(() => {
+        if (status === 'success') {
+            const newTimeoutId = setTimeout(() => {
+                console.log({ isOpen, status });
+
+                if (isOpen) {
+                    onClose();
+                    setStatus(null);
+                }
+            }, 5000);
+            timeoutId.current = newTimeoutId
+        } else {
+            clearTimeout(timeoutId.current)
+        }
+    }, [status])
+
     const isSeed = mandala.rarity === 'Seed';
     const userOwns = mandala.ownerAddress === userAddress
 
@@ -58,10 +76,6 @@ const MandalaCard = ({ mandala }) => {
             const { data, signature } = response.data;
             const op = await contract.methods.render(mandala.id, data, signature).send();
             setStatus('success');
-            debounce(() => {
-                onClose();
-                setStatus(null);
-            }, 5000)();
             await op.confirmation();
             toast({
                 title: "Mandala created from Seed",
@@ -124,7 +138,10 @@ const MandalaCard = ({ mandala }) => {
                     {!userOwns && <a style={{ width: '50%' }} target="_blank" rel="noreferrer noopener" href={`https://better-call.dev/${config.network}/${mandala.ownerAddress}/`}> <Text fontSize="xs" isTruncated>{mandala.ownerAddress}</Text> </a>}
                 </Flex>
             </Flex>
-            <Modal isOpen={isOpen} onClose={onClose} isCentered closeOnOverlayClick={status !== 'processing'} closeOnEsc={status !== 'processing'}>
+            <Modal isOpen={isOpen} onClose={() => {
+                setStatus(null);
+                onClose();
+            }} isCentered closeOnOverlayClick={status !== 'processing'} closeOnEsc={status !== 'processing'}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Create Mandala</ModalHeader>

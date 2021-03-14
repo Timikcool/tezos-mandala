@@ -11,7 +11,6 @@ import MandalaCard from "../components/MandalaCard";
 import { useApp } from "../state/app";
 import { processMandalas } from "../utils/data";
 import BuySeedModal from "../components/BuySeedModal";
-import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
@@ -122,7 +121,7 @@ export const MyCollectionPage = () => {
       );
     }
     // * sort mandalas by sort
-  }, [sort, rarityFilter, totalMandalas.length]);
+  }, [sort, rarityFilter, JSON.stringify(totalMandalas)]);
   return (
     <VStack spacing={16} w="100%">
       <Text fontSize="5xl" align="center">
