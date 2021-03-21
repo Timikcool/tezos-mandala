@@ -2,7 +2,13 @@ import { Flex, HStack, Text, VStack, Wrap, WrapItem } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
 import { Spinner } from "@chakra-ui/spinner";
 import { isObjectLike, orderBy, sortBy, startCase } from "lodash";
-import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  ChangeEvent,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 import RaritySelector from "../components/RaritySelector";
 import { getBigMapKeys, getContractStorage } from "../service/bcd";
 import config from "../config.json";
@@ -40,7 +46,7 @@ export const ExplorePage = () => {
   const [filteredMandalas, setFilteredMandalas] = useState([]);
   const [totalMandalas, setTotalMandalas] = useState([]);
   const [sort, setSort] = useState("rarity");
-  const { subscriber, Tezos } = useApp();
+  const timeoutId = useRef(null);
 
   const getStorage = useCallback(
     async (toggleLoading = true) => {
@@ -64,14 +70,11 @@ export const ExplorePage = () => {
 
   useEffect(() => {
     getStorage();
-    subscriber.on("data", (transaction) => {
-      // * update on events
-      if (["buy", "render"].includes(transaction?.parameters?.entrypoint)) {
-        getStorage(false);
-      }
-    });
-    const interval = setInterval(() => getStorage(false), 15000);
-    return () => clearInterval(interval);
+    timeoutId.current = setTimeout(function run() {
+      getStorage(false);
+      timeoutId.current = setTimeout(run, 15000);
+    }, 15000);
+    return () => clearTimeout(timeoutId.current);
   }, [getStorage]);
 
   useEffect(() => {

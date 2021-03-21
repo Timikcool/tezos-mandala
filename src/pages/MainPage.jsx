@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/layout";
 import { Button, IconButton, Img } from "@chakra-ui/react";
 import { range } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { HashLink } from "react-router-hash-link";
 import BuySeedModal from "../components/BuySeedModal";
 
@@ -39,26 +39,29 @@ const exampleMandalas = [
 
 const MainPage = () => {
   const [nextId, setNextId] = useState(1);
-  const { subscriber } = useApp();
+  const { contract: contractInstance, setupContract } = useApp();
+  const timeoutId = useRef(null);
 
   const getCurrentPosition = useCallback(async () => {
-    const storage = await getContractStorage(config.contract);
-    const nextId = selectObjectByKeys(storage, {
-      type: "nat",
-      name: "next_id",
-    })?.value;
+    // const storage = await getContractStorage(config.contract);
+    // const nextId = selectObjectByKeys(storage, {
+    //   type: "nat",
+    //   name: "next_id",
+    // })?.value;
+    const contract = contractInstance || (await setupContract());
+    const storage = await contract.storage();
+    const nextId = storage.next_id.toNumber();
+    console.log({ nextId, contractInstance });
     setNextId(parseInt(nextId || 2) - 1);
   }, [setNextId]);
 
   useEffect(() => {
     getCurrentPosition();
-    subscriber.on("data", (transaction) => {
-      if (["buy"].includes(transaction?.parameters?.entrypoint)) {
-        getCurrentPosition();
-      }
-    });
-    const interval = setInterval(() => getCurrentPosition(), 15000);
-    return () => clearInterval(interval);
+    timeoutId.current = setTimeout(function run() {
+      getCurrentPosition();
+      timeoutId.current = setTimeout(run, 15000);
+    }, 15000);
+    return () => clearTimeout(timeoutId.current);
   }, [getCurrentPosition]);
   return (
     <VStack maxW="100%" spacing="115px" marginTop="96px !important">
