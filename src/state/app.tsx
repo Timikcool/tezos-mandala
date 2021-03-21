@@ -50,7 +50,7 @@ export const AppProvider: React.FC = ({ children }) => {
     const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
     const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState<string>("transfer");
-
+    const [mandalaToSend, setMandalaToSend] = useState(null);
     const [buyingSeed, setBuyingSeed] = useState<boolean>(false);
     const [convertingSeed, setConvertingSeed] = useState<boolean>(false);
 
@@ -104,11 +104,16 @@ export const AppProvider: React.FC = ({ children }) => {
         const balance = await Tezos.tz.getBalance(userAddress);
         setUserBalance(balance.toNumber());
         // creates contract instance
+        await setupContract()
+        // setStorage(storage?.toNumber());
+    };
+
+    const setupContract = async () => {
         const contract = await Tezos.wallet.at(contractAddress);
         // const storage: any = await contract.storage();
         setContract(contract);
-        // setStorage(storage?.toNumber());
-    };
+        return contract;
+    }
 
     const connectWallet = async (): Promise<void> => {
         setConnectingWallet(true);
@@ -220,6 +225,14 @@ export const AppProvider: React.FC = ({ children }) => {
         }
     };
 
+    const openSendModal = (mandala) => {
+        setMandalaToSend(mandala)
+    }
+
+    const closeSendModal = () => {
+        setMandalaToSend(undefined)
+    }
+
 
 
     let v = {
@@ -228,10 +241,15 @@ export const AppProvider: React.FC = ({ children }) => {
         disconnectWallet,
         connectWallet,
         buySeed,
+        openSendModal,
+        closeSendModal,
+        setupContract,
         userAddress,
         wallet,
         contract,
-        subscriber
+        subscriber,
+        mandalaToSend,
+        Tezos
     }
 
     return <AppContext.Provider value={v}>{children}</AppContext.Provider>

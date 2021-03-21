@@ -8,9 +8,10 @@ import { useApp } from '../state/app';
 import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
 import { Image } from '@chakra-ui/image';
 import BuySeedModal from './BuySeedModal';
+import WalletButton from './WalletButton';
 
 
-const Logo = styled.a`
+const Logo = styled(ReactLink)`
 font-family: Roboto;
 font-style: normal;
 font-weight: 500;
@@ -49,8 +50,9 @@ const Header = () => {
 
     return (
         <>
-            <Flex justify="space-between" w="100%" paddingTop="32px">
-                <Logo href="/">
+            <Flex justify="space-between" w="100%" paddingTop="32px" align="center"
+            >
+                <Logo to="/">
                     <Image src="favicon.png" alt="" w="20px" h="20px" />
                     Tezos Mandala
                 </Logo>
@@ -58,7 +60,7 @@ const Header = () => {
                 <Box display={{ base: "flex", md: "none" }} align="center" onClick={handleToggle} _hover={{
                     cursor: 'pointer'
                 }}>
-                    {show ? <CloseIcon /> : <HamburgerIcon />}
+                    {show ? <CloseIcon w="1.5em" h="1.5em" /> : <HamburgerIcon w="1.5em" h="1.5em" />}
                 </Box >
 
                 <Box display={{ base: "none", md: "block" }} >
@@ -66,8 +68,6 @@ const Header = () => {
                         {/* <Link as={HashLink} smooth to="/#create-mandala" textDecoration="none" _hover={{ textDecoration: "none", color: 'inherit' }}>
                             <Button variant="outline" colorScheme="black" border="none" textDecoration="none" >Get Mandala</Button>
                         </Link> */}
-
-                        <BuySeedModal />
 
                         <Link as={HashLink} smooth to='/#why-tezos-mandala' _hover={{ textDecoration: 'underline' }} >
                             Why Mandala
@@ -78,11 +78,16 @@ const Header = () => {
                         <Link as={ReactLink} to="/explore" activeStyle={{ color: ' #FCA311' }} _hover={{ textDecoration: 'underline' }}>
                             Explore Mandalas
                     </Link>
+
+                        <WalletButton />
+                        <BuySeedModal />
                     </HStack>
                 </Box>
             </Flex >
             {    show && <Box marginLeft="auto" marginRight="0" marginTop="4px" >
                 <VStack spacing={4}>
+
+
                     <Link as={HashLink} smooth to='/#why-tezos-mandala' _hover={{ color: 'inherit', textDecoration: 'underline' }} >
                         Why Mandala
                     </Link>
@@ -93,9 +98,8 @@ const Header = () => {
                         Explore Mandalas
                     </Link>
 
-                    <Link as={HashLink} smooth to="/#create-mandala" textDecoration="none" _hover={{ textDecoration: "none", color: 'inherit' }}>
-                        <Button variant="outline" colorScheme="black" border="none" textDecoration="none" >Get Mandala</Button>
-                    </Link>
+                    <WalletButton />
+                    <BuySeedModal />
                 </VStack>
             </Box>}
         </>

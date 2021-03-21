@@ -26,6 +26,7 @@ import exampleMandala4 from "../assets/img/example-mandala-4.svg";
 import exampleMandala5 from "../assets/img/example-mandala-5.svg";
 import exampleMandala6 from "../assets/img/example-mandala-6.svg";
 import { useApp } from "../state/app";
+import { Helmet } from "react-helmet";
 
 const exampleMandalas = [
   exampleMandala1,
@@ -36,15 +37,7 @@ const exampleMandalas = [
   exampleMandala6,
 ];
 
-// const scrollToCreateMandala = document
-//   .querySelector("#create-mandala")
-//   .scrollIntoView({ behavior: "smooth" });
-
 const MainPage = () => {
-  //   const scrollToCreateMandala = document
-  //     .querySelector("#create-mandala")
-  //     ?.scrollIntoView({ behavior: "smooth" });
-
   const [nextId, setNextId] = useState(1);
   const { subscriber } = useApp();
 
@@ -68,8 +61,26 @@ const MainPage = () => {
     return () => clearInterval(interval);
   }, [getCurrentPosition]);
   return (
-    <VStack maxW="100%" spacing={16}>
-      <Flex h="calc(100vh - 104px)" align="center">
+    <VStack maxW="100%" spacing="115px" marginTop="96px !important">
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Tezos Mandala: a Generative Art Project on Tezos</title>
+        <meta
+          name="description"
+          content="Create your unique digital mandalas as NFTs. All mandalas are recorded in the Tezos blockchain. This makes them truly decentralized, trustless, and ever-lasting."
+        />
+
+        <meta
+          property="og:title"
+          content="Tezos Mandala: a Generative Art Project on Tezos"
+        />
+        <meta
+          property="og:description"
+          content="Create your unique digital mandalas as NFTs. All mandalas are recorded in the Tezos blockchain. This makes them truly decentralized, trustless, and ever-lasting."
+        />
+        <meta property="og:url" content="http://tezos-mandala.art/" />
+      </Helmet>
+      <Flex align="center">
         <VStack spacing={8} maxW="100%">
           <Text fontSize="5xl" align="center">
             Tezos Mandala: a Generative Art Project
@@ -77,43 +88,52 @@ const MainPage = () => {
           {/* <PageHeader></PageHeader> */}
           <Text fontSize="3xl" align="center" fontWeight="300">
             Create your unique digital mandalas as NFTs. All the mandalas are
-            recorded in the Tezos blockchain forever, so they are truly
+            recorded in the Tezos blockchain forever, so that they are truly
             decentralized and trustless.
           </Text>
-          <Flex w="100%" justify="center">
+          <Flex
+            w="100%"
+            justify="center"
+            display={{ base: "none", md: "flex" }}
+          >
             <HashLink to="/#create-mandala">
               <IconButton
                 colorScheme="orange"
                 isRound
-                icon={<ChevronDownIcon />}
+                icon={<ChevronDownIcon w="2em" h="2em" />}
+                size="lg"
               />
             </HashLink>
           </Flex>
         </VStack>
       </Flex>
       <Flex minH="100vh" align="center" id="create-mandala" maxW="100%">
-        <VStack spacing={16} maxW="100%">
+        <VStack spacing={8} maxW="100%">
           <Text fontSize="5xl" align="center">
             Create Your Mandala
           </Text>
 
-          <Wrap justify="center">
+          <Wrap justify="center" spacing="16px">
             {/* 6 mandalas here */}
 
             {exampleMandalas.map((src) => (
-              <WrapItem>
-                <Img src={src} w="250px" h="250px" />
+              <WrapItem w={{ base: "100%", md: "auto" }}>
+                <Img
+                  src={src}
+                  w={{ base: "100%", md: "320px" }}
+                  h={{ base: "calc(100vw - 30px)", md: "320px" }}
+                />
               </WrapItem>
             ))}
           </Wrap>
 
           <VStack>
             <Text fontSize="xl" align="center" fontWeight="300">
-              Mandala price starts from 5 tez and increases with 5 tez every 100
+              Mandala price starts from 5 tez and increases by 5 tez every 100
               mandalas.
             </Text>
             <Text fontSize="xl" align="center" fontWeight="300">
-              There will be only 2,000 mandalas generated.
+              Only 1,999 mandalas will be generated.
             </Text>
             <Text fontSize="xl" align="center" fontWeight="300">
               The final 100 mandalas will be sold for 100 tez per mandala
@@ -159,25 +179,31 @@ const MainPage = () => {
               />
             </Flex>
             <Box
-              display={{ base: "none", md: "flex" }}
+              display="flex"
               className="prices"
               w="100%"
               justifyContent="space-around"
+              position="relative"
             >
               {range(1, 21).map((stage) => (
                 <Flex
                   className={`stage-${stage}-price`}
-                  marginLeft="12px"
                   key={stage.toString()}
+                  position="absolute"
+                  left={
+                    stage === 20
+                      ? `calc(${(stage / 20) * 100}% - 45px)`
+                      : `calc(${(stage / 20) * 100}% - 4%)`
+                  }
+                  display={
+                    getPriceFromId(nextId) === stage * 5 ||
+                    stage === 1 ||
+                    stage === 20
+                      ? "block"
+                      : "none"
+                  }
                 >
-                  <Text
-                    fontSize="xs"
-                    visibility={
-                      getPriceFromId(nextId) === stage * 5 || stage === 20
-                        ? "show"
-                        : "hidden"
-                    }
-                  >{`${stage * 5} tez`}</Text>
+                  <Text fontSize="xs">{`${stage * 5} tez`}</Text>
                 </Flex>
               ))}
             </Box>
@@ -188,7 +214,7 @@ const MainPage = () => {
         </VStack>
       </Flex>
       <Flex minHeight="100vh" align="center" id="why-tezos-mandala">
-        <VStack spacing={16}>
+        <VStack spacing={8}>
           <Text fontSize="5xl" align="center">
             Why Tezos Mandala
           </Text>
@@ -231,13 +257,13 @@ const MainPage = () => {
               , pp. 195–196.
             </Text>
             <Text fontSize="lg" align="left" fontWeight="300">
-              Mandala for Jung was a way of interaction with our unconscious, a
+              For Jung, mandala was a way of interacting with the unconscious, a
               way of plunging into inner self and rebalancing.
             </Text>
             <Text fontSize="lg" align="left" fontWeight="300">
-              Jung was talking about physical mandalas which a person is drawing
-              here and now. Digital Tezos Mandalas are also being drawn by a
-              person here and now but this time by his unique hash.
+              Jung was talking about physical mandalas a person draws here and
+              now. Digital Tezos Mandalas are also drawn by a person here and
+              now but this time with their unique hash.
             </Text>
             <Text fontSize="lg" align="left" fontWeight="300">
               To create your mandala you will need a mandala seed (buy it here
@@ -266,21 +292,26 @@ const MainPage = () => {
 
             <Text fontSize="lg" align="left" fontWeight="300">
               While generating, Tezos Mandala is given an initial name. The name
-              will consist of some kind words. A month later, when you meet your
-              mandala closer, you can rename it. It will be more difficult to
-              change the name of your mandala after that and only possible after
-              two months of its continuous possession. Then, you can rename your
-              mandala after 4 months, then after 8 months, and so on, a time
-              will double after each renaming. Tezos Mandalas are not stored on
-              the Amazon cloud and not even on IPFS, they are recorded in the
-              Tezos blockchain forever. That is why they are truly decentralized
-              and trustless.
+              will consist of some kind words. In a month, when you meet your
+              mandala, you can rename it. Afterward, you will only be able to
+              change its name again once you have owned the mandala for two
+              months. Then, you can rename your mandala in 4 months, then in 8
+              months, and so on, with the time span doubling after each
+              renaming. Tezos Mandalas are not stored on the Amazon cloud and
+              not even on IPFS, they are recorded in the Tezos blockchain
+              forever. That is why they are truly decentralized and trustless.
             </Text>
 
             <Text fontSize="lg" align="left" fontWeight="300">
-              {`In total, there will be 2,000 mandalas generated. Mandala seeds
-              will be sold at an increasing price to reward early adopters of
-              the project. For now, ${2000 - nextId} mandalas left.`}
+              {`In total, there will be 1,999 mandalas generated. Mandala seeds will be sold at a gradually increasing price in order to reward early adopters of the project. Right now, ${
+                2000 - nextId
+              } mandalas left.`}
+            </Text>
+
+            <Text fontSize="sm" fontWeight="300">
+              Disclaimer: Tezos Mandalas are used as an art experiment to
+              showcase the tooling of the Tezos ecosystem like Beacon, Taquito
+              etc.
             </Text>
 
             <Flex w="100%" justify="center">
@@ -290,8 +321,8 @@ const MainPage = () => {
         </VStack>
       </Flex>
 
-      <Flex h="100vh" align="center" id="NFT Marketplacey Is Coming">
-        <VStack spacing={16}>
+      <Flex align="center" id="nft-marketplace">
+        <VStack spacing={8}>
           <Text fontSize="5xl" align="center">
             NFT Marketplace Is Coming
           </Text>
@@ -302,8 +333,8 @@ const MainPage = () => {
             project that we are working on is NFT Button. This is an
             NFT-marketplace where people can trade Tezos Mandalas and any other
             NFTs on the Tezos blockchain. The main feature of this marketplace
-            is a new type of all-pay auction, which we named Buttonist auction.
-            It will be fun, stay tuned.
+            is a new type of all-pay auction we call Buttonist auction. It will
+            be fun, so stay tuned.
           </Text>
         </VStack>
       </Flex>

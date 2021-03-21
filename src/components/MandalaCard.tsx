@@ -18,6 +18,7 @@ import { useApp } from '../state/app';
 // import { saveSvgAsPng } from 'save-svg-as-png';
 import Canvg, { presets, RenderingContext2D } from 'canvg';
 import { useToast } from '@chakra-ui/toast';
+import { shortage } from '../utils/shortage';
 
 const decodeHexToSvg = (hexString: string) => {
     let packed = hexString;
@@ -28,7 +29,7 @@ const decodeHexToSvg = (hexString: string) => {
 }
 
 const savePng = async (svg: string, name: string) => {
-    const canvas = new OffscreenCanvas(500, 500);
+    const canvas = new OffscreenCanvas(2000, 2000);
     const ctx = canvas.getContext('2d') as RenderingContext2D;
     const v = await Canvg.from(ctx, svg, presets.offscreen());
 
@@ -39,9 +40,10 @@ const savePng = async (svg: string, name: string) => {
 }
 
 const MandalaCard = ({ mandala }) => {
-    const { contract, userAddress } = useApp()
+    const { contract: contractInstance, setupContract, userAddress, openSendModal } = useApp()
     const [status, setStatus] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [errorDescription, setErrorDescription] = useState(null);
     const toast = useToast();
     const timeoutId = useRef(null);
 
@@ -74,23 +76,33 @@ const MandalaCard = ({ mandala }) => {
         try {
             const response = await axios.get(`${config.tokenService}/json/${mandala.id}`);
             const { data, signature } = response.data;
+            const contract = contractInstance || await setupContract();
             const op = await contract.methods.render(mandala.id, data, signature).send();
             setStatus('success');
             await op.confirmation();
             toast({
-                title: "Mandala created from Seed",
-                description: "It will be updated in My Collection tab in a minute",
+                title: "Mandala was created",
+                description: "Your Mandala was successfully created from the Mandala Seed. Check it in the My Collection tab.",
                 status: "success",
                 duration: 3500,
                 isClosable: true,
+                position: "top-right"
             });
 
         } catch (error) {
+            console.log(error);
+            if (error?.title === 'Aborted') {
+                setStatus('initial');
+                onClose();
+                return;
+            }
             setStatus('error')
+            setErrorDescription(JSON.stringify(error))
         }
     }
 
     let svg = "";
+    let base = '';
     if (mandala.imageString) {
         svg = decodeHexToSvg(mandala.imageString)
         if (!svg.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
@@ -102,15 +114,19 @@ const MandalaCard = ({ mandala }) => {
 
         //add xml declaration
         svg = '<?xml version="1.0" standalone="no"?>\r\n' + svg;
+        base = window.btoa(svg);
     }
 
     const handleDownload = () => {
         savePng(svg, mandala.name)
+    }
 
+    const handleSend = () => {
+        openSendModal(mandala);
     }
     return (
         <>
-            <Flex w="230px" h="360px" borderRadius="6px"
+            <Flex w={{ base: '100%', md: '310px' }} h={{ base: 'auto', md: '440px' }} borderRadius="6px"
                 background="#ffffff"
                 boxShadow="18px 18px 36px #ebebeb,
                      -18px -18px 36px #ffffff"
@@ -120,9 +136,9 @@ const MandalaCard = ({ mandala }) => {
                     <Text fontSize="md" fontWeight="500" color="gray.200">{mandala.id}</Text>
                     <Text fontSize="md" fontWeight="500">{mandala.rarity}</Text>
                 </Flex>
-                <Flex w="100%" minH="230px" position="relative">
+                <Flex w="100%" minH="310px" position="relative">
                     {
-                        isSeed ? <Image w="100%" h="250px" opacity="0.1" src={sampleMandala} alt="sample" /> : <Box w="100%" h="100%" dangerouslySetInnerHTML={{ __html: svg }} />
+                        isSeed ? <Image w="100%" h="250px" opacity="0.1" src={sampleMandala} alt="sample" /> : <Box w="100%" h={{ base: "calc(100vw - 30px)", md: 'auto' }} backgroundImage={`url(data:image/svg+xml;base64,${base})`} />
                     }
                 </Flex>
 
@@ -130,12 +146,15 @@ const MandalaCard = ({ mandala }) => {
                     {mandala.name && mandala.name !== "Seed" && <Text isTruncated fontSize="12px">{mandala.name}</Text>}
                 </Flex>
                 <Flex padding="8px" minH="48px" justify="space-between" align="center">
-                    <Text fontSize="sm" fontWeight="500">
-                        {`${getPriceFromId(mandala.id)} tez`}
-                    </Text>
+                    {userOwns ? <Button boxShadow="none" size="sm"
+                        background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleSend}>Send</Button> :
+                        <Text fontSize="sm" fontWeight="500">
+                            {`${getPriceFromId(mandala.id)} tez`}
+                        </Text>}
                     {showConvertButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleCreateMandala}>Create Mandala</Button>}
                     {showDownloadButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleDownload} variant="mandala-card">Download</Button>}
-                    {!userOwns && <a style={{ width: '50%' }} target="_blank" rel="noreferrer noopener" href={`https://better-call.dev/${config.network}/${mandala.ownerAddress}/`}> <Text fontSize="xs" isTruncated>{mandala.ownerAddress}</Text> </a>}
+                    {!userOwns && <a target="_blank" rel="noreferrer noopener" href={`https://better-call.dev/${config.network}/${mandala.ownerAddress}/`}> <Text fontSize="xs">{
+                        shortage(mandala.ownerAddress)}</Text> </a>}
                 </Flex>
             </Flex>
             <Modal isOpen={isOpen} onClose={() => {
@@ -169,13 +188,14 @@ const MandalaCard = ({ mandala }) => {
                                 justifyContent="center"
                                 textAlign="center"
                                 height="200px"
+                                borderRadius="6px"
                             >
                                 <AlertIcon boxSize="40px" mr={0} />
                                 <AlertTitle mt={4} mb={1} fontSize="lg">
-                                    Success!
+                                    Transaction was sent
                             </AlertTitle>
                                 <AlertDescription maxWidth="sm">
-                                    Your transaction sent successfully. Mandala will appear at My Collection tab after confirmation.
+                                    Your transaction was successfully sent and should be confirmed in a minute. Once it’s confirmed, your Mandala will appear in the My Collection tab.
                             </AlertDescription>
                             </Alert>)
                         }
@@ -189,14 +209,15 @@ const MandalaCard = ({ mandala }) => {
                                 justifyContent="center"
                                 textAlign="center"
                                 height="200px"
+                                borderRadius="6px"
                             >
                                 <AlertIcon boxSize="40px" mr={0} />
                                 <AlertTitle mt={4} mb={1} fontSize="lg">
                                     Error
                             </AlertTitle>
                                 <AlertDescription maxWidth="sm">
-                                    Something went wrong. Please try again
-                            </AlertDescription>
+                                    {errorDescription || 'Something went wrong. Please try again'}
+                                </AlertDescription>
                             </Alert>)
                         }
 

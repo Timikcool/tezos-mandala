@@ -1,7 +1,7 @@
 import { Flex, HStack, Text, VStack, Wrap, WrapItem } from "@chakra-ui/layout";
 import { Select } from "@chakra-ui/select";
 import { Spinner } from "@chakra-ui/spinner";
-import { orderBy, sortBy, startCase } from "lodash";
+import { isObjectLike, orderBy, sortBy, startCase } from "lodash";
 import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
 import RaritySelector from "../components/RaritySelector";
 import { getBigMapKeys, getContractStorage } from "../service/bcd";
@@ -11,6 +11,8 @@ import MandalaCard from "../components/MandalaCard";
 import { useApp } from "../state/app";
 import { processMandalas } from "../utils/data";
 import BuySeedModal from "../components/BuySeedModal";
+import axios from "axios";
+import { Helmet } from "react-helmet";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
@@ -43,34 +45,16 @@ export const MyCollectionPage = () => {
       if (userAddress) {
         toggleLoading && setLoading(true);
         try {
-          const storage = await getContractStorage(config.contract);
-          const tokensMapId = selectObjectByKeys(storage, {
-            type: "big_map",
-            name: "token_metadata",
-          })?.value;
-          const ownersMapId = selectObjectByKeys(storage, {
-            type: "big_map",
-            name: "ledger",
-          })?.value;
-
-          const metadataMapId = selectObjectByKeys(storage, {
-            type: "big_map",
-            name: "metadata",
-          })?.value;
-          const [tokens, owners, metadata] = await Promise.all([
-            getBigMapKeys(tokensMapId, 2000),
-            getBigMapKeys(ownersMapId, 2000),
-            getBigMapKeys(metadataMapId, 2000),
-          ]);
-
-          const totalMandalas = processMandalas(
-            tokens,
-            owners,
-            metadata
-          ).filter((mandala) => mandala.ownerAddress === userAddress);
+          const response = await axios.get(config.tokensCache);
+          console.log({ response });
+          if (!isObjectLike(response?.data)) {
+            throw new Error("Bad cache data");
+          }
+          const totalMandalas = processMandalas(response.data).filter(
+            (mandala) => mandala.ownerAddress === userAddress
+          );
 
           // const keys = await get;
-          console.log({ storage, tokens, owners, totalMandalas });
           setTotalMandalas(totalMandalas);
           toggleLoading && setLoading(false);
         } catch (error) {
@@ -124,6 +108,24 @@ export const MyCollectionPage = () => {
   }, [sort, rarityFilter, JSON.stringify(totalMandalas)]);
   return (
     <VStack spacing={16} w="100%">
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Tezos Mandala: My Collection</title>
+        <meta
+          name="description"
+          content="Watch your unique digital mandalas as NFTs. All mandalas are recorded in the Tezos blockchain. This makes them truly decentralized, trustless, and ever-lasting."
+        />
+
+        <meta property="og:title" content="Tezos Mandala: My Collection" />
+        <meta
+          property="og:description"
+          content="Watch your unique digital mandalas as NFTs. All mandalas are recorded in the Tezos blockchain. This makes them truly decentralized, trustless, and ever-lasting."
+        />
+        <meta
+          property="og:url"
+          content="http://tezos-mandala.art/my-collection"
+        />
+      </Helmet>
       <Text fontSize="5xl" align="center">
         My Collection
       </Text>
@@ -143,7 +145,7 @@ export const MyCollectionPage = () => {
             <Text align="center" fontSize="3xl">
               {`${startCase(rarityFilter)} (${filteredMandalas.length})`}
             </Text>
-            <Text>{userAddress}</Text>
+            {/* <Text>{userAddress}</Text> */}
           </VStack>
 
           <HStack spacing={4} w="100%">
@@ -179,9 +181,9 @@ export const MyCollectionPage = () => {
             )}
           </HStack>
 
-          <Wrap spacing="30px" justify="center" w="100%">
+          <Wrap spacing="30px" justify="start" w="100%">
             {filteredMandalas.map((mandala) => (
-              <WrapItem key={mandala.id}>
+              <WrapItem key={mandala.id} w={{ base: "100%", md: "auto" }}>
                 <MandalaCard mandala={mandala} />
               </WrapItem>
             ))}

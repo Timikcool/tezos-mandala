@@ -4,7 +4,8 @@
     },
     "network": "edo2net",
     "networkType": "edonet",
-    "rpc": "https://edonet.smartpy.io",
-    "contract": "KT1SrqjcVFjFTHb22msQ5fFSNMzSzWdpgz8c",
-    "tokenService": "https://tezos-mandala.art"
+    "rpc": "https://testnet-tezos.giganode.io",
+    "contract": "KT1WgeR4SaaTiTrwzrR1aD7h9YfeUTWcvC9j",
+    "tokenService": "https://tezos-mandala.art",
+    "tokensCache": "https://tezos-mandala.art/static/cache.json"
 }
