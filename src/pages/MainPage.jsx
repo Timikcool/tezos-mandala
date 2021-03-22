@@ -8,16 +8,12 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/layout";
-import { Button, IconButton, Img } from "@chakra-ui/react";
+import { Button, IconButton, Image } from "@chakra-ui/react";
 import { range } from "lodash";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { HashLink } from "react-router-hash-link";
 import BuySeedModal from "../components/BuySeedModal";
-
-import { getContractStorage } from "../service/bcd";
-
 import config from "../config.json";
-import selectObjectByKeys from "../utils/selectObjectByKeys";
 import { getPriceFromId } from "../utils/price";
 import exampleMandala1 from "../assets/img/example-mandala-1.svg";
 import exampleMandala2 from "../assets/img/example-mandala-2.svg";
@@ -25,8 +21,11 @@ import exampleMandala3 from "../assets/img/example-mandala-3.svg";
 import exampleMandala4 from "../assets/img/example-mandala-4.svg";
 import exampleMandala5 from "../assets/img/example-mandala-5.svg";
 import exampleMandala6 from "../assets/img/example-mandala-6.svg";
+import howItWorksMobile from "../assets/img/how-it-works-mobile.png";
+import howItWorksDesktop from "../assets/img/how-it-works-desktop.png";
 import { useApp } from "../state/app";
 import { Helmet } from "react-helmet";
+import { useBreakpointValue } from "@chakra-ui/react";
 
 const exampleMandalas = [
   exampleMandala1,
@@ -41,6 +40,7 @@ const MainPage = () => {
   const [nextId, setNextId] = useState(1);
   const { contract: contractInstance, setupContract } = useApp();
   const timeoutId = useRef(null);
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const getCurrentPosition = useCallback(async () => {
     // const storage = await getContractStorage(config.contract);
@@ -90,9 +90,9 @@ const MainPage = () => {
           </Text>
           {/* <PageHeader></PageHeader> */}
           <Text fontSize="3xl" align="center" fontWeight="300">
-            Create your unique digital mandalas as NFTs. All the mandalas are
-            recorded in the Tezos blockchain forever, so that they are truly
-            decentralized and trustless.
+            Create your unique digital mandalas as NFTs. All mandalas are
+            recorded in the Tezos blockchain. This makes them truly
+            decentralized, trustless, and ever-lasting.
           </Text>
           <Flex
             w="100%"
@@ -121,7 +121,7 @@ const MainPage = () => {
 
             {exampleMandalas.map((src) => (
               <WrapItem w={{ base: "100%", md: "auto" }}>
-                <Img
+                <Image
                   src={src}
                   w={{ base: "100%", md: "320px" }}
                   h={{ base: "calc(100vw - 30px)", md: "320px" }}
@@ -168,7 +168,7 @@ const MainPage = () => {
                 top="-24px"
                 left={`calc(${(nextId / 2000) * 100}% - 7px)`}
               >
-                <Text fontSize="xs">{`${2000 - nextId} mandalas left`}</Text>
+                <Text fontSize="xs">{`${1999 - nextId} mandalas left`}</Text>
               </Flex>
               <Flex
                 className="current-pointer"
@@ -216,12 +216,16 @@ const MainPage = () => {
           </Flex>
         </VStack>
       </Flex>
-      <Flex minHeight="100vh" align="center" id="why-tezos-mandala">
+      <Flex minHeight="100vh" align="center" id="how-it-works">
         <VStack spacing={8}>
           <Text fontSize="5xl" align="center">
-            Why Tezos Mandala
+            How It Works
           </Text>
-          {/* <PageHeader></PageHeader> */}
+          {isMobile ? (
+            <Image src={howItWorksMobile} />
+          ) : (
+            <Image src={howItWorksDesktop} />
+          )}
           <VStack spacing={8} align="start">
             <Text fontSize="lg" align="left" fontWeight="300">
               Tezos Mandala is a digital generative art. This is an experiment
@@ -237,17 +241,7 @@ const MainPage = () => {
               </Link>
             </Text>
             <Text fontSize="lg" align="left" fontWeight="300">
-              It all started with Carl Jung:
-            </Text>
-            <Text fontSize="lg" align="left" fontWeight="300">
-              I sketched every morning in a notebook a small circular drawing,
-              ... which seemed to correspond to my inner situation at the time.
-              ... Only gradually did I discover what the mandala really is: ...
-              the Self, the wholeness of the personality, which if all goes well
-              is harmonious.
-            </Text>
-            <Text fontSize="lg" align="left" fontWeight="300">
-              — Carl Jung,{" "}
+              It all started with Carl Jung (
               <Link
                 href="https://en.wikipedia.org/wiki/Memories,_Dreams,_Reflections"
                 target="_blank"
@@ -257,8 +251,23 @@ const MainPage = () => {
               >
                 Memories, Dreams, Reflections
               </Link>
-              , pp. 195–196.
+              , pp. 195–196):
             </Text>
+            <Text
+              fontSize="lg"
+              align="left"
+              fontWeight="300"
+              fontStyle="italic"
+              borderLeft="2px solid var(--chakra-colors-gray-200)"
+              paddingLeft="20px"
+            >
+              "I sketched every morning in a notebook a small circular drawing,
+              ... which seemed to correspond to my inner situation at the time.
+              ... Only gradually did I discover what the mandala really is: ...
+              the Self, the wholeness of the personality, which if all goes well
+              is harmonious."
+            </Text>
+
             <Text fontSize="lg" align="left" fontWeight="300">
               For Jung, mandala was a way of interacting with the unconscious, a
               way of plunging into inner self and rebalancing.
@@ -278,8 +287,10 @@ const MainPage = () => {
                 color="#0a58ca"
                 textDecoration="underline"
                 href={`https://better-call.dev/${config.network}/${config.contract}/`}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                smart-contract
+                smart contract
               </Link>{" "}
               generates a mandala from the hash of this transaction.
             </Text>
@@ -312,9 +323,9 @@ const MainPage = () => {
             </Text>
 
             <Text fontSize="sm" fontWeight="300">
-              Disclaimer: Tezos Mandalas are used as an art experiment to
-              showcase the tooling of the Tezos ecosystem like Beacon, Taquito
-              etc.
+              Disclaimer: Tezos Mandala is an art experiment with an unaudited
+              smart contract aimed at showcasing tools for Tezos, such as
+              Beacon, Taquito, etc.
             </Text>
 
             <Flex w="100%" justify="center">

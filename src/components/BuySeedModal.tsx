@@ -18,7 +18,7 @@ import {
     useToast,
     Box
 } from "@chakra-ui/react"
-import { debounce } from "lodash";
+import { debounce, get } from "lodash";
 import config from '../config.json';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { getContractStorage } from "../service/bcd";
@@ -87,8 +87,21 @@ const BuySeedModal = () => {
                 onClose();
                 return;
             }
+
+            if (error?.name === "MissedBlockDuringConfirmationError") {
+                setStatus('error')
+                return setErrorDescription('This thing is that it takes some time to confirm your previous operation. Please try again in a minute. It should work OK then.')
+            }
+
+            if (error?.name === 'BeaconWalletNotInitialized') {
+                setStatus('error');
+                return setErrorDescription("Tezos wallet didn't make it this time. Please refresh a page and try again")
+            }
+
+            const additional = get(error, 'data[1].with.string', '')
+            const errorString = error?.title ? `${error.title} ${additional}` : JSON.stringify(error);
             setStatus('error')
-            setErrorDescription(JSON.stringify(error))
+            setErrorDescription(errorString)
         }
     }
 
@@ -179,7 +192,7 @@ const BuySeedModal = () => {
                             >
                                 <AlertIcon boxSize="40px" mr={0} />
                                 <AlertTitle mt={4} mb={1} fontSize="lg">
-                                    Error
+                                    Oops! Blockchain didn't make it this time.
                             </AlertTitle>
                                 <AlertDescription maxWidth="sm">
                                     {errorDescription || 'Something went wrong. Please try again'}

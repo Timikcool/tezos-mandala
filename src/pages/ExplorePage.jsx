@@ -25,7 +25,7 @@ import { Helmet } from "react-helmet";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
-    return orderBy(mandalas, "timestamp", ["desc"]);
+    return orderBy(mandalas, (mandala) => parseInt(mandala?.id || 0), ["desc"]);
   }
 
   if (sorter === "price") {
@@ -154,9 +154,9 @@ export const ExplorePage = () => {
                   <option value="new" key="new">
                     new
                   </option>
-                  <option value="price" key="price">
+                  {/* <option value="price" key="price">
                     price
-                  </option>
+                  </option> */}
                 </Select>
               </>
             ) : (

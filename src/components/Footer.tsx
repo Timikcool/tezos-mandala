@@ -24,8 +24,8 @@ export const Footer = () => {
 
                         <HStack spacing={4} align="center">
                             <Link alignSelf="flex-end" fontSize="18px" fontWeight="300" href="https://github.com/Timikcool/tezos-mandala"><FaGithubAlt /></Link>
-                            <Link alignSelf="flex-end" fontSize="18px" fontWeight="300" href={`https://better-call.dev/${config.network}/${config.contract}/`}><FaTwitter /></Link>
-                            <Link alignSelf="flex-end" fontSize="18px" fontWeight="300" href={`https://better-call.dev/${config.network}/${config.contract}/`}><FaTelegramPlane /></Link>
+                            <Link alignSelf="flex-end" fontSize="18px" fontWeight="300" href={`https://twitter.com/buttonists`}><FaTwitter /></Link>
+                            <Link alignSelf="flex-end" fontSize="18px" fontWeight="300" href={`https://t.me/buttonists`}><FaTelegramPlane /></Link>
                         </HStack>
 
                     </Flex>

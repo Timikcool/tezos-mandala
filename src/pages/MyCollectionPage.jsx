@@ -22,11 +22,11 @@ import { Helmet } from "react-helmet";
 
 const sortBySorter = (mandalas, sorter) => {
   if (sorter === "new") {
-    return orderBy(mandalas, "timestamp", ["desc"]);
+    return orderBy(mandalas, (mandala) => parseInt(mandala?.id || 0), ["desc"]);
   }
 
   if (sorter === "price") {
-    return mandalas;
+    return orderBy(mandalas, "id", ["desc"]);
   }
 
   if (sorter === "rarity") {
@@ -167,9 +167,9 @@ export const MyCollectionPage = () => {
                   <option value="rarity" key="rarity">
                     rarity
                   </option>
-                  <option value="price" key="price">
+                  {/* <option value="price" key="price">
                     price
-                  </option>
+                  </option> */}
                 </Select>
               </>
             ) : (

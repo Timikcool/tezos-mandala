@@ -11,7 +11,7 @@ import { saveAs } from 'file-saver';
 import { Alert, AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/alert';
 import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from '@chakra-ui/modal';
 import { Spinner } from '@chakra-ui/spinner';
-import { debounce } from 'lodash';
+import { debounce, get } from 'lodash';
 import { useDisclosure } from '@chakra-ui/hooks';
 import axios from 'axios';
 import { useApp } from '../state/app';
@@ -96,8 +96,28 @@ const MandalaCard = ({ mandala }) => {
                 onClose();
                 return;
             }
+
+            if (error?.name === "MissedBlockDuringConfirmationError") {
+                setStatus('error')
+                return setErrorDescription('This thing is that it takes some time to confirm your previous operation. Please try again in a minute. It should work OK then.')
+            }
+
+
+            if (error?.name === 'BeaconWalletNotInitialized') {
+                setStatus('error');
+                return setErrorDescription("Tezos wallet didn't make it this time. Please refresh a page and try again")
+            }
+
+            const additional = get(error, 'data[1].with.string', '')
+
+            if (additional === 'MINTED_ALREADY') {
+                setStatus('error')
+                return setErrorDescription('Mandala has already been created')
+            }
+
+            const errorString = error?.title ? `${error.title} ${additional}` : JSON.stringify(error);
             setStatus('error')
-            setErrorDescription(JSON.stringify(error))
+            setErrorDescription(errorString)
         }
     }
 
@@ -149,7 +169,7 @@ const MandalaCard = ({ mandala }) => {
                     {userOwns ? <Button boxShadow="none" size="sm"
                         background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleSend}>Send</Button> :
                         <Text fontSize="sm" fontWeight="500">
-                            {`${getPriceFromId(mandala.id)} tez`}
+                            {`${getPriceFromId(parseInt(mandala.id) + 1)} tez`}
                         </Text>}
                     {showConvertButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleCreateMandala}>Create Mandala</Button>}
                     {showDownloadButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleDownload} variant="mandala-card">Download</Button>}
@@ -213,7 +233,7 @@ const MandalaCard = ({ mandala }) => {
                             >
                                 <AlertIcon boxSize="40px" mr={0} />
                                 <AlertTitle mt={4} mb={1} fontSize="lg">
-                                    Error
+                                    Oops! Blockchain didn't make it this time.
                             </AlertTitle>
                                 <AlertDescription maxWidth="sm">
                                     {errorDescription || 'Something went wrong. Please try again'}

@@ -69,8 +69,8 @@ const Header = () => {
                             <Button variant="outline" colorScheme="black" border="none" textDecoration="none" >Get Mandala</Button>
                         </Link> */}
 
-                        <Link as={HashLink} smooth to='/#why-tezos-mandala' _hover={{ textDecoration: 'underline' }} >
-                            Why Mandala
+                        <Link as={HashLink} smooth to='/#how-it-works' _hover={{ textDecoration: 'underline' }} >
+                            How It Works
                     </Link>
                         <Link as={ReactLink} to="/my-collection" activeStyle={{ color: ' #FCA311' }} _hover={{ textDecoration: 'underline' }}>
                             My Collection
@@ -88,8 +88,8 @@ const Header = () => {
                 <VStack spacing={4}>
 
 
-                    <Link as={HashLink} smooth to='/#why-tezos-mandala' _hover={{ color: 'inherit', textDecoration: 'underline' }} >
-                        Why Mandala
+                    <Link as={HashLink} smooth to='/#how-it-works' _hover={{ color: 'inherit', textDecoration: 'underline' }} >
+                        How It Works
                     </Link>
                     <Link as={ReactLink} to="/my-collection" onClick={handleMyCollectionClick} activeStyle={{ color: ' #FCA311' }} _hover={{ color: 'inherit', textDecoration: 'underline' }}>
                         My Collection
