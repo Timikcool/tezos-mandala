@@ -16,7 +16,7 @@ module.exports = (shipit) => {
     },
   });
   shipit.blTask("copy-build", async () => {
-    await shipit.local("npm run build");
+    // await shipit.local("npm run build");
     await shipit.copyToRemote("build", "/home/deploy");
   });
 };

@@ -68,7 +68,7 @@ const Header = () => {
                         {/* <Link as={HashLink} smooth to="/#create-mandala" textDecoration="none" _hover={{ textDecoration: "none", color: 'inherit' }}>
                             <Button variant="outline" colorScheme="black" border="none" textDecoration="none" >Get Mandala</Button>
                         </Link> */}
-
+                        {/* 
                         <Link as={HashLink} smooth to='/#how-it-works' _hover={{ textDecoration: 'underline' }} >
                             How It Works
                     </Link>
@@ -77,10 +77,10 @@ const Header = () => {
                     </Link>
                         <Link as={ReactLink} to="/explore" activeStyle={{ color: ' #FCA311' }} _hover={{ textDecoration: 'underline' }}>
                             Explore Mandalas
-                    </Link>
-
+                    </Link> */}
+                        <Link href="https://t.me/buttonists">Join Telegram Group</Link>
                         <WalletButton />
-                        <BuySeedModal />
+                        {/* <BuySeedModal /> */}
                     </HStack>
                 </Box>
             </Flex >
@@ -88,7 +88,7 @@ const Header = () => {
                 <VStack spacing={4}>
 
 
-                    <Link as={HashLink} smooth to='/#how-it-works' _hover={{ color: 'inherit', textDecoration: 'underline' }} >
+                    {/* <Link as={HashLink} smooth to='/#how-it-works' _hover={{ color: 'inherit', textDecoration: 'underline' }} >
                         How It Works
                     </Link>
                     <Link as={ReactLink} to="/my-collection" onClick={handleMyCollectionClick} activeStyle={{ color: ' #FCA311' }} _hover={{ color: 'inherit', textDecoration: 'underline' }}>
@@ -96,10 +96,10 @@ const Header = () => {
                     </Link>
                     <Link as={ReactLink} to="/explore" activeStyle={{ color: ' #FCA311' }} _hover={{ color: 'inherit', textDecoration: 'underline' }}>
                         Explore Mandalas
-                    </Link>
-
+                    </Link> */}
+                    <Link href="https://t.me/buttonists">Join Telegram Group</Link>
                     <WalletButton />
-                    <BuySeedModal />
+                    {/* <BuySeedModal /> */}
                 </VStack>
             </Box>}
         </>
