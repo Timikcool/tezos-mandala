@@ -220,7 +220,7 @@ export const AppProvider: React.FC = ({ children }) => {
     }
 
     const disconnectWallet = async (): Promise<void> => {
-        //window.localStorage.clear();
+        window.localStorage.clear();
         setUserAddress("");
         setUserBalance(0);
         setWallet(null);

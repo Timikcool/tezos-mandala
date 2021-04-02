@@ -169,7 +169,7 @@ const MandalaCard = ({ mandala }) => {
                 <Flex w="100%" justify="center" h="40px" padding="8px">
                     {mandala.name && mandala.name !== "Seed" && <Text isTruncated fontSize="12px">{mandala.name}</Text>}
                 </Flex>
-                <Flex padding="8px" minH="48px" justify="space-between" align="center">
+                <Flex padding="8px" minH="48px" justify="flex-end" align="center">
                     {/* {userOwns ? <Button boxShadow="none" size="sm"
                         background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleSend}>Send</Button> :
                         <Text fontSize="sm" fontWeight="500">
@@ -179,7 +179,7 @@ const MandalaCard = ({ mandala }) => {
                     {showDownloadButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleDownload} variant="mandala-card">Download</Button>}
                     {!userOwns && <a target="_blank" rel="noreferrer noopener" href={`https://better-call.dev/${config.network}/${mandala.ownerAddress}/`}> <Text fontSize="xs">{
                         shortage(mandala.ownerAddress)}</Text> </a>} */}
-                    <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleMigrate} variant="mandala-card">Migrate</Button>
+                    <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleMigrate} variant="mandala-card">Manage</Button>
                 </Flex>
             </Flex>
             {/* <Modal isOpen={isOpen} onClose={() => {

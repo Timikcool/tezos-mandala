@@ -7,6 +7,6 @@
     "rpc": "https://testnet-tezos.giganode.io",
     "contract": "KT1WgeR4SaaTiTrwzrR1aD7h9YfeUTWcvC9j",
     "tokenService": "https://tezos-mandala.art",
-    "tokensCache": "http://localhost:8080/static/cache.json",
-    "migrationContract": "KT1P5CkRzsNTyXhtKTfCJNUtGQ3XipL6kYXF"
+    "tokensCache": "https://tezos-mandala.art/static/cache.json",
+    "migrationContract": "KT195Mo1aBBLvzMVGQhiSWRDngp5PoQANavy"
 }

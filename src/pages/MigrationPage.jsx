@@ -126,7 +126,7 @@ export const MigrationPage = () => {
         />
       </Helmet>
       <Text fontSize="5xl" align="center">
-        Migration to Tezos Mandala V2
+        Migration to Tezos Mandala v2
       </Text>
 
       {loading ? (
