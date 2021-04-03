@@ -113,7 +113,7 @@ const MigratingMandalaModal = () => {
     if (!migratingMandala) return null;
     const isSeed = migratingMandala.rarity === 'Seed';
     return (
-        <Modal isOpen onClose={close} isCentered size={migrating ? 'lg' : "5xl"} closeOnEsc={!migrating} closeOnOverlayClick={!migrating} >
+        <Modal isOpen onClose={close} size={migrating ? 'lg' : "5xl"} closeOnEsc={!migrating} closeOnOverlayClick={!migrating} >
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader isTruncated>{`Migration of #${migratingMandala.id} mandala to Tezos Mandala v2`}</ModalHeader>
@@ -145,13 +145,13 @@ const MigratingMandalaModal = () => {
                                 <RadioGroup onChange={val => setMigrateOption(val as string)} value={migrateOption}>
                                     <Stack direction="column">
                                         <Radio colorScheme="orange" _hover={{ cursor: 'pointer' }} _focus={{ boxShadow: '0 0 0 3px var(--chakra-colors-orange-200)' }} value="0" ><Text fontWeight="500" >Get New Seed</Text></Radio>
-                                        <Text size="xs" fontWeight="300" marginInlineStart="1.5em">
+                                        <Text size="xs" fontWeight="300" style={{ marginInlineStart: "1.5em" }}>
                                             Exchange your seed or mandala for a new seed in v2 with the same ID. This option has no time limitations.</Text>
                                         <Radio colorScheme="orange" _hover={{ cursor: 'pointer' }} _focus={{ boxShadow: '0 0 0 3px var(--chakra-colors-orange-200)' }} value="1" disabled={isSeed}><Text fontWeight="500">Migrate Your Mandala</Text></Radio>
-                                        <Text size="xs" fontWeight="300" marginInlineStart="1.5em">
+                                        <Text size="xs" fontWeight="300" style={{ marginInlineStart: "1.5em" }}>
                                             Transfer your mandala to v2 without changes and with the same ID. This option is only available from April 2nd, 2021 at 3 P.M. UTC to April 6th, 2021 at 3 A.M. UTC.    </Text>
                                         <Radio colorScheme="orange" _hover={{ cursor: 'pointer' }} _focus={{ boxShadow: '0 0 0 3px var(--chakra-colors-orange-200)' }} value="2" ><Text fontWeight="500">Get Refund</Text></Radio>
-                                        <Text size="xs" fontWeight="300" marginInlineStart="1.5em">
+                                        <Text size="xs" fontWeight="300" style={{ marginInlineStart: "1.5em" }}>
                                             Send us your seed or mandala to get tez you had paid for it minus the tx fee for refunding. The tez are sent to the address from which you had sent your seed/mandala. You can use that tez to buy seeds in v2 but only at their current price (the starting price in v2 is 30 tez). This option is only available from April 2nd, 2021 at 3 P.M. UTC to April 6th, 2021 at 3 A.M. UTC.</Text>
                                     </Stack>
                                 </RadioGroup>
