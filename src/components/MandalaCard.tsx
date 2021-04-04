@@ -74,10 +74,8 @@ const MandalaCard = ({ mandala }) => {
         onOpen();
 
         try {
-            const response = await axios.get(`${config.tokenService}/json/${mandala.id}`);
-            const { data, signature } = response.data;
             const contract = contractInstance || await setupContract();
-            const op = await contract.methods.render(mandala.id, data, signature).send();
+            const op = await contract.methods.mint(mandala.id).send();
             setStatus('success');
             await op.confirmation();
             toast({

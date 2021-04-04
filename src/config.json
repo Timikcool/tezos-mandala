@@ -2,10 +2,10 @@
     "bcd": {
         "api": "https://api.better-call.dev"
     },
-    "network": "mainnet",
-    "networkType": "mainnet",
-    "rpc": "https://mainnet-tezos.giganode.io",
-    "contract": "KT1EH8yKXkRoxNkULRB1dSuwhkKyi5LJH82o",
+    "network": "edo2net",
+    "networkType": "edonet",
+    "rpc": "https://testnet-tezos.giganode.io",
+    "contract": "KT195Mo1aBBLvzMVGQhiSWRDngp5PoQANavy",
     "tokenService": "https://tezos-mandala.art",
-    "tokensCache": "https://tezos-mandala.art/static/cache.json"
+    "tokensCache": "https://tezos-mandala.art/static/KT195Mo1aBBLvzMVGQhiSWRDngp5PoQANavy.json"
 }

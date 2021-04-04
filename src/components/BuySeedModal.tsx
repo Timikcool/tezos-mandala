@@ -64,8 +64,10 @@ const BuySeedModal = () => {
         try {
             setStatus('processing');
             const storage = await getContractStorage(config.contract);
-            const id = parseInt(selectObjectByKeys(storage, { type: 'nat', name: "next_id" })?.value) + 1;
+            const id = parseInt(selectObjectByKeys(storage, { type: 'nat', name: "next_id" })?.value);
             const price = tzToMutez(getPriceFromId(id));
+            console.log({ price });
+
             const contract = contractInstance || await setupContract();
             const op = await contract.methods.buy(1).send({ amount: price, mutez: true });
             setStatus('success')
