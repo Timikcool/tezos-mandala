@@ -69,6 +69,7 @@ const MandalaCard = ({ mandala }) => {
         onOpen();
 
         try {
+
             const signatureResponse = await wallet.client.requestSignPayload({ payload: mandala.id });
             const accounts = JSON.parse(localStorage.getItem('beacon:accounts'));
             const currentAccountId = localStorage.getItem('beacon:active-account');
@@ -76,8 +77,9 @@ const MandalaCard = ({ mandala }) => {
             console.log(`${currentAccount.publicKey}-${signatureResponse.signature}`);
             const response = await axios.get(`${config.tokenService}/json/${currentAccount.publicKey}-${signatureResponse.signature}`);
             const { data, signature } = response.data;
+
             const contract = contractInstance || await setupContract();
-            const op = await contract.methods.render(mandala.id, data, signature).send();
+            const op = await contract.methods.mint(mandala.id).send();
             setStatus('success');
             await op.confirmation();
             toast({
