@@ -5,8 +5,8 @@
     "network": "edo2net",
     "networkType": "edonet",
     "rpc": "https://testnet-tezos.giganode.io",
-    "contract": "KT195Mo1aBBLvzMVGQhiSWRDngp5PoQANavy",
+    "contract": "KT1WgeR4SaaTiTrwzrR1aD7h9YfeUTWcvC9j",
     "tokenService": "https://tezos-mandala.art",
-    "migrationContract": "KT1DKBvxiwDR7qazNuuxCxY2AaXnoytmDE7H"
-    "tokensCache": "https://tezos-mandala.art/static/KT195Mo1aBBLvzMVGQhiSWRDngp5PoQANavy.json"
+    "tokensCache": "https://tezos-mandala.art/static/cache.json",
+    "migrationContract": "KT195Mo1aBBLvzMVGQhiSWRDngp5PoQANavy"
 }

@@ -11,10 +11,10 @@ export const processMandalas = (tokens) => {
         const ownerAddress = token[3];
         const rarity = token[4];
         const imageString = token[5];
-        
+        const version = token[6];
         return [
           ...acc,
-          { id, timestamp:id, rarity, ownerAddress, name, imageString },
+          { id, timestamp:id, rarity, ownerAddress, name, imageString, version },
         ];
       }, []);
 

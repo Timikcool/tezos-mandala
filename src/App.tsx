@@ -3,7 +3,7 @@ import "./App.css";
 import Header from "./components/Header";
 import { VStack } from "@chakra-ui/layout";
 import { Container } from "@chakra-ui/layout";
-import { Route, Router, Switch } from 'react-router-dom';
+import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import MainPage from "./pages/MainPage";
 // import { useApp } from "./state/app";
@@ -11,6 +11,8 @@ import { ExplorePage } from "./pages/ExplorePage";
 import { MyCollectionPage } from "./pages/MyCollectionPage";
 import { Footer } from "./components/Footer";
 import SendMandalaModal from "./components/SendMandalaModal";
+import { MigrationPage } from "./pages/MigrationPage";
+import MigratingMandalaModal from "./components/MigratingMandalaModal";
 
 const history = createBrowserHistory({});
 
@@ -24,9 +26,11 @@ const App = () => {
           <Router history={history}>
             <Header />
             <Switch>
-              <Route exact path='/' component={MainPage} />
+              {/* <Route exact path='/' component={MainPage} />
               <Route exact path='/explore' component={ExplorePage} />
-              <Route exact path='/my-collection' component={MyCollectionPage} />
+              <Route exact path='/my-collection' component={MyCollectionPage} /> */}
+              <Route exact path='/migration' component={MigrationPage} />
+              <Redirect from="/*" to='/migration' />
             </Switch>
 
           </Router>
@@ -34,6 +38,7 @@ const App = () => {
       </Container>
       <Footer />
       <SendMandalaModal />
+      <MigratingMandalaModal />
     </>
   )
 };
