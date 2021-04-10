@@ -150,6 +150,9 @@ const MigratingMandalaModal = () => {
                                         <Radio colorScheme="orange" _hover={{ cursor: 'pointer' }} _focus={{ boxShadow: '0 0 0 3px var(--chakra-colors-orange-200)' }} value="1" disabled={isSeed}><Text fontWeight="500">Migrate Your Mandala</Text></Radio>
                                         <Text size="xs" fontWeight="300" style={{ marginInlineStart: "1.5em" }}>
                                             Transfer your mandala to v2 without changes and with the same ID. This option is only available until April 22nd, 15:00 UTC.</Text>
+                                        <Text size="xs" fontWeight="300" style={{ marginInlineStart: "1.5em" }}>
+                                            First your mandala will appear in v2 as a seed. Please don't click 'create mandala' on it but wait until it turns into your mandala by itself, which will happen within a day. If you do click 'create mandala,' it will generate a new mandala and transferring your old one will become impossible: it will be lost for all of the eternity.
+                                            </Text>
                                         {/* <Radio colorScheme="orange" _hover={{ cursor: 'pointer' }} _focus={{ boxShadow: '0 0 0 3px var(--chakra-colors-orange-200)' }} value="2" ><Text fontWeight="500">Get Refund</Text></Radio>
                                         <Text size="xs" fontWeight="300" style={{ marginInlineStart: "1.5em" }}>
                                             Send us your seed or mandala to get tez you had paid for it minus the tx fee for refunding. The tez are sent to the address from which you had sent your seed/mandala. You can use that tez to buy seeds in v2 but only at their current price (the starting price in v2 is 30 tez). This option is only available from April 2nd, 2021 at 3 P.M. UTC to April 6th, 2021 at 3 A.M. UTC.</Text> */}

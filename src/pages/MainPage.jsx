@@ -36,6 +36,10 @@ const exampleMandalas = [
   exampleMandala6,
 ];
 
+const newRange = range(7, 21);
+let newRangePrices = [];
+newRange.forEach((stage) => stage);
+
 const MainPage = () => {
   const [nextId, setNextId] = useState(1);
   const { contract: contractInstance, setupContract } = useApp();
@@ -133,13 +137,18 @@ const MainPage = () => {
           <VStack>
             <Text fontSize="xl" align="center" fontWeight="300">
               Mandala price starts from 5 tez and increases by 5 tez every 100
-              mandalas.
+              mandalas until 600 mandalas are sold.
             </Text>
             <Text fontSize="xl" align="center" fontWeight="300">
-              Only 1,999 mandalas will be generated.
+              After that, the price increases by 5 tez after 70 mandalas are
+              sold. Then the price increases by 5 tez every (N - 5) mandalas,
+              where N is the number of mandalas in the previous iteration.
             </Text>
             <Text fontSize="xl" align="center" fontWeight="300">
-              The final 100 mandalas will be sold for 100 tez per mandala
+              The final 5 mandalas will be sold for 100 tez per mandala.
+            </Text>
+            <Text fontSize="xl" align="center" fontWeight="300">
+              Only 1,124 mandalas will be generated overall.
             </Text>
           </VStack>
 
@@ -166,9 +175,17 @@ const MainPage = () => {
                 className="left-to-mint"
                 position="absolute"
                 top="-24px"
-                left={`calc(${(nextId / 2000) * 100}% - 7px)`}
+                left={`calc(${(nextId / 1124) * 100}% - 7px)`}
               >
-                <Text fontSize="xs">{`${1999 - nextId} mandalas left`}</Text>
+                <Text fontSize="xs">{`${1124 - nextId} mandalas left`}</Text>
+              </Flex>
+              <Flex
+                className="current-price"
+                position="absolute"
+                top="12px"
+                left={`calc(${(nextId / 1124) * 100}% - 7px)`}
+              >
+                <Text fontSize="xs">{`${getPriceFromId(nextId)} tez`}</Text>
               </Flex>
               <Flex
                 className="current-pointer"
@@ -178,7 +195,7 @@ const MainPage = () => {
                 background="red.500"
                 borderRadius="100%"
                 top="-2.5px"
-                left={`${(nextId / 2000) * 100}%`}
+                left={`${(nextId / 1124) * 100}%`}
               />
             </Flex>
             <Box
@@ -198,13 +215,7 @@ const MainPage = () => {
                       ? `calc(${(stage / 20) * 100}% - 45px)`
                       : `calc(${(stage / 20) * 100}% - 4%)`
                   }
-                  display={
-                    getPriceFromId(nextId) === stage * 5 ||
-                    stage === 1 ||
-                    stage === 20
-                      ? "block"
-                      : "none"
-                  }
+                  display={stage === 1 || stage === 20 ? "block" : "none"}
                 >
                   <Text fontSize="xs">{`${stage * 5} tez`}</Text>
                 </Flex>
@@ -317,8 +328,8 @@ const MainPage = () => {
             </Text>
 
             <Text fontSize="lg" align="left" fontWeight="300">
-              {`In total, there will be 1,999 mandalas generated. Mandala seeds will be sold at a gradually increasing price in order to reward early adopters of the project. Right now, ${
-                2000 - nextId
+              {`In total, there will be 1,1124 mandalas generated. Mandala seeds will be sold at a gradually increasing price in order to reward early adopters of the project. Right now, ${
+                1124 - nextId
               } mandalas left.`}
             </Text>
 

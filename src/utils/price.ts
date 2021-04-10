@@ -1,7 +1,18 @@
-import { range } from "lodash";
+import { find, range } from "lodash";
 
 export const priceRanges = range(1, 20).map(range => range * 5);
 export const tokensRange = range(1, 20).map(range => range * 100);
+export const newStagesTestCases = [{stage:7, amount:70, price:35}, {stage:8, amount: 65,	price:40}]
+export let newStages = [{stage:7, amount: 70, price:35}];
+const newRanges = range(8, 21);
+let startPrice = 35;
+newRanges.reduce((prev, stage) => {
+    const nextStage = {stage, amount:prev.amount - 5, price: prev.price + 5};
+    newStages.push(nextStage);
+    return nextStage;
+}, {stage:7, amount: 70, price:35})
+
+export const getPriceFromStage = stage => find(newStages, (obj) => obj.stage === stage)?.price
 export const getPriceFromId = (id) => {
     const number = parseInt(id);
     if (number >= 1120) return 100;
@@ -18,6 +29,9 @@ export const getPriceFromId = (id) => {
     if (number >= 735) return 45;
     if (number >= 670) return 40;
     if (number >= 600) return 35;
-    return 30;
+    
+    const closestEndIndex = tokensRange.findIndex(range => range >= number) || 0;
+    const price = priceRanges[closestEndIndex];
+    return price
     
 }

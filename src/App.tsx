@@ -26,11 +26,11 @@ const App = () => {
           <Router history={history}>
             <Header />
             <Switch>
-              {/* <Route exact path='/' component={MainPage} />
+              <Route exact path='/' component={MainPage} />
               <Route exact path='/explore' component={ExplorePage} />
-              <Route exact path='/my-collection' component={MyCollectionPage} /> */}
+              <Route exact path='/my-collection' component={MyCollectionPage} />
               <Route exact path='/migration' component={MigrationPage} />
-              <Redirect from="/*" to='/migration' />
+              {/* <Redirect from="/*" to='/migration' /> */}
             </Switch>
 
           </Router>

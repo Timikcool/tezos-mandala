@@ -7,6 +7,6 @@
     "rpc": "https://testnet-tezos.giganode.io",
     "contract": "KT195Mo1aBBLvzMVGQhiSWRDngp5PoQANavy",
     "tokenService": "https://tezos-mandala.art",
-    "migrationContract": "KT1DKBvxiwDR7qazNuuxCxY2AaXnoytmDE7H"
+    "migrationContract": "KT1DKBvxiwDR7qazNuuxCxY2AaXnoytmDE7H",
     "tokensCache": "https://tezos-mandala.art/static/KT195Mo1aBBLvzMVGQhiSWRDngp5PoQANavy.json"
 }
