@@ -78,7 +78,10 @@ const Header = () => {
                         <Link as={ReactLink} to="/explore" activeStyle={{ color: ' #FCA311' }} _hover={{ textDecoration: 'underline' }}>
                             Explore Mandalas
                     </Link>
-
+                        <Link as={ReactLink} to="/migration" activeStyle={{ color: ' #FCA311' }} _hover={{ color: 'inherit', textDecoration: 'underline' }}>
+                            Migration
+                    </Link>
+                        {/* <Link href="https://t.me/buttonists">Join Telegram Group</Link> */}
                         <WalletButton />
                         <BuySeedModal />
                     </HStack>
@@ -97,7 +100,10 @@ const Header = () => {
                     <Link as={ReactLink} to="/explore" activeStyle={{ color: ' #FCA311' }} _hover={{ color: 'inherit', textDecoration: 'underline' }}>
                         Explore Mandalas
                     </Link>
-
+                    <Link as={ReactLink} to="/migration" activeStyle={{ color: ' #FCA311' }} _hover={{ color: 'inherit', textDecoration: 'underline' }}>
+                        Migration
+                    </Link>
+                    {/* <Link href="https://t.me/buttonists">Join Telegram Group</Link> */}
                     <WalletButton />
                     <BuySeedModal />
                 </VStack>

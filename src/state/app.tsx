@@ -13,6 +13,7 @@ import selectObjectByKeys from '../utils/selectObjectByKeys';
 import { tzToMutez } from '../utils/mutez';
 import { getPriceFromId } from '../utils/price';
 import axios from 'axios';
+import { SigningType } from '@airgap/beacon-sdk'
 import tokenServiceResponse from './token_service_response.json'
 
 
@@ -53,6 +54,7 @@ export const AppProvider: React.FC = ({ children }) => {
     const [mandalaToSend, setMandalaToSend] = useState(null);
     const [buyingSeed, setBuyingSeed] = useState<boolean>(false);
     const [convertingSeed, setConvertingSeed] = useState<boolean>(false);
+    const [migratingMandala, setMigratingMandala] = useState(null);
 
     // * contract
     // https://better-call.dev/edo2net/KT1C1ESWEedUGdSPvWsaKJQNhkUJUHuXBVQU
@@ -140,8 +142,16 @@ export const AppProvider: React.FC = ({ children }) => {
                 }
             });
             setWallet(wallet);
+
+            // const accounts = JSON.parse(localStorage.getItem('beacon:accounts'));
+            // const currentAccountId = localStorage.getItem('beacon:active-account');
+
+            // const currentAccount = accounts.find(({ accountIdentifier }) => accountIdentifier === currentAccountId);
+            // console.log(`${currentAccount.publicKey}`);
+            // console.log(`${currentAccount.publicKey}-${signatureResponse.signature}`);
             // gets user's address
             const userAddress = await wallet.getPKH();
+
             await setup(userAddress);
             setBeaconConnection(true);
         } catch (error) {
@@ -210,7 +220,7 @@ export const AppProvider: React.FC = ({ children }) => {
     }
 
     const disconnectWallet = async (): Promise<void> => {
-        //window.localStorage.clear();
+        window.localStorage.clear();
         setUserAddress("");
         setUserBalance(0);
         setWallet(null);
@@ -244,6 +254,8 @@ export const AppProvider: React.FC = ({ children }) => {
         openSendModal,
         closeSendModal,
         setupContract,
+        setMigratingMandala,
+        migratingMandala,
         userAddress,
         wallet,
         contract,
