@@ -4,7 +4,7 @@ import { Box, Input, Radio, RadioGroup, Spinner, Stack, Text, useToast, VStack }
 import React, { useState } from 'react'
 import fix from '../utils/crutch';
 import { useApp } from '../state/app';
-import { migrationContract } from '../config.json'
+import { oldContract } from '../config.json'
 import { get } from 'lodash';
 
 const MigratingMandalaModal = () => {
@@ -21,27 +21,27 @@ const MigratingMandalaModal = () => {
         setMigrating(true);
         try {
             const contract = contractInstance || await setupContract();
-            const migrationContractInstance = await Tezos.wallet.at(migrationContract);
-            const sc = (contract.methods.update_operators([
+            const oldContractInstance = await Tezos.wallet.at(oldContract);
+            const sc = (oldContractInstance.methods.update_operators([
                 {
                     add_operator: {
                         owner: userAddress,
-                        operator: migrationContract,
+                        operator: contract,
                         token_id: migratingMandala.id
                     }
                 }
             ]).parameterSchema.root.val = fix);
-            const updateOperatorsOperation = await contract.methods.update_operators([
+            const updateOperatorsOperation = await oldContractInstance.methods.update_operators([
                 {
                     add_operator: {
                         owner: userAddress,
-                        operator: migrationContract,
+                        operator: contract,
                         token_id: migratingMandala.id,
                     },
                 },
             ]).send();
             await updateOperatorsOperation.confirmation();
-            const op = await migrationContractInstance.methods.migrate_seed(migrateOption, migratingMandala.id).send();
+            const op = await contract.methods.migrate_seed(migrateOption, migratingMandala.id).send();
             toast({
                 title: "Transaction was sent",
                 description: "The transaction was sent and should be confirmed in a minute.",

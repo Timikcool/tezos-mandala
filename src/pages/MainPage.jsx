@@ -328,7 +328,7 @@ const MainPage = () => {
             </Text>
 
             <Text fontSize="lg" align="left" fontWeight="300">
-              {`In total, there will be 1,1124 mandalas generated. Mandala seeds will be sold at a gradually increasing price in order to reward early adopters of the project. Right now, ${
+              {`In total, there will be 1,124 mandalas generated. Mandala seeds will be sold at a gradually increasing price in order to reward early adopters of the project. Right now, ${
                 1124 - nextId
               } mandalas left.`}
             </Text>

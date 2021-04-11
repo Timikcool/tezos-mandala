@@ -52,8 +52,7 @@ export const MigrationPage = () => {
       if (userAddress) {
         toggleLoading && setLoading(true);
         try {
-          const response = await axios.get(config.tokensCache);
-          console.log({ response });
+          const response = await axios.get(config.oldTokensCache);
           if (!isObjectLike(response?.data)) {
             throw new Error("Bad cache data");
           }

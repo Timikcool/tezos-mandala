@@ -5,7 +5,9 @@
     "network": "mainnet",
     "networkType": "mainnet",
     "rpc": "https://mainnet-tezos.giganode.io",
-    "contract": "KT1EH8yKXkRoxNkULRB1dSuwhkKyi5LJH82o",
+    "contract": "KT1DKBvxiwDR7qazNuuxCxY2AaXnoytmDE7H",
+    "tokensCache": "https://tezos-mandala.art/static/KT1DKBvxiwDR7qazNuuxCxY2AaXnoytmDE7H.json",
     "tokenService": "https://tezos-mandala.art",
-    "tokensCache": "https://tezos-mandala.art/static/KT1EH8yKXkRoxNkULRB1dSuwhkKyi5LJH82o.json"
+    "oldContract": "KT1EH8yKXkRoxNkULRB1dSuwhkKyi5LJH82o",
+    "oldTokensCache": "https://tezos-mandala.art/static/KT1EH8yKXkRoxNkULRB1dSuwhkKyi5LJH82o.json"
 }
