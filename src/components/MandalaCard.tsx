@@ -60,9 +60,10 @@ const MandalaCard = ({ mandala }) => {
 
     const isSeed = mandala.rarity === 'Seed';
     const userOwns = mandala.ownerAddress === userAddress
+    const isOld = mandala?.old;
 
-    const showConvertButton = isSeed && userOwns;
-    const showDownloadButton = !isSeed && userOwns;
+    const showConvertButton = isSeed && userOwns && !isOld;
+    const showDownloadButton = !isSeed && userOwns && !isOld;
 
     const handleCreateMandala = async () => {
         setStatus('processing')
@@ -70,13 +71,13 @@ const MandalaCard = ({ mandala }) => {
 
         try {
 
-            const signatureResponse = await wallet.client.requestSignPayload({ payload: mandala.id });
-            const accounts = JSON.parse(localStorage.getItem('beacon:accounts'));
-            const currentAccountId = localStorage.getItem('beacon:active-account');
-            const currentAccount = accounts.find(({ accountIdentifier }) => accountIdentifier === currentAccountId);
-            console.log(`${currentAccount.publicKey}-${signatureResponse.signature}`);
-            const response = await axios.get(`${config.tokenService}/json/${currentAccount.publicKey}-${signatureResponse.signature}`);
-            const { data, signature } = response.data;
+            // const signatureResponse = await wallet.client.requestSignPayload({ payload: mandala.id });
+            // const accounts = JSON.parse(localStorage.getItem('beacon:accounts'));
+            // const currentAccountId = localStorage.getItem('beacon:active-account');
+            // const currentAccount = accounts.find(({ accountIdentifier }) => accountIdentifier === currentAccountId);
+            // console.log(`${currentAccount.publicKey}-${signatureResponse.signature}`);
+            // const response = await axios.get(`${config.tokenService}/json/${currentAccount.publicKey}-${signatureResponse.signature}`);
+            // const { data, signature } = response.data;
 
             const contract = contractInstance || await setupContract();
             const op = await contract.methods.mint(mandala.id).send();
@@ -171,8 +172,8 @@ const MandalaCard = ({ mandala }) => {
                 <Flex w="100%" justify="center" h="40px" padding="8px">
                     {mandala.name && mandala.name !== "Seed" && <Text isTruncated fontSize="12px">{mandala.name}</Text>}
                 </Flex>
-                <Flex padding="8px" minH="48px" justify="flex-end" align="center">
-                    {/* {userOwns ? <Button boxShadow="none" size="sm"
+                <Flex padding="8px" minH="48px" justify="space-between" align="center">
+                    {userOwns && !isOld ? <Button boxShadow="none" size="sm"
                         background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleSend}>Send</Button> :
                         <Text fontSize="sm" fontWeight="500">
                             {`${getPriceFromId(parseInt(mandala.id) + 1)} tez`}
@@ -180,8 +181,8 @@ const MandalaCard = ({ mandala }) => {
                     {showConvertButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleCreateMandala}>Create Mandala</Button>}
                     {showDownloadButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleDownload} variant="mandala-card">Download</Button>}
                     {!userOwns && <a target="_blank" rel="noreferrer noopener" href={`https://better-call.dev/${config.network}/${mandala.ownerAddress}/`}> <Text fontSize="xs">{
-                        shortage(mandala.ownerAddress)}</Text> </a>} */}
-                    <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleMigrate} variant="mandala-card">Manage</Button>
+                        shortage(mandala.ownerAddress)}</Text> </a>}
+                    {isOld && userOwns && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleMigrate} variant="mandala-card">Manage</Button>}
                 </Flex>
             </Flex>
             {/* <Modal isOpen={isOpen} onClose={() => {

@@ -1,7 +1,7 @@
 import { reduce } from "lodash";
 import selectObjectByKeys from "./selectObjectByKeys";
 
-export const processMandalas = (tokens) => {
+export const processMandalas = (tokens, old = false) => {
 
     const totalMandalas = reduce(tokens,(acc, token, id) => {
         //   const id = selectObjectByKeys(token, {type:'nat', name:'key'})
@@ -14,7 +14,7 @@ export const processMandalas = (tokens) => {
         const version = token[6];
         return [
           ...acc,
-          { id, timestamp:id, rarity, ownerAddress, name, imageString, version },
+          { id, timestamp:id, rarity, ownerAddress, name, imageString, version, old },
         ];
       }, []);
 

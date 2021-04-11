@@ -56,7 +56,7 @@ export const MigrationPage = () => {
           if (!isObjectLike(response?.data)) {
             throw new Error("Bad cache data");
           }
-          const totalMandalas = processMandalas(response.data).filter(
+          const totalMandalas = processMandalas(response.data, true).filter(
             (mandala) => mandala.ownerAddress === userAddress
           );
 
