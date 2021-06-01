@@ -1,7 +1,6 @@
 import { Button } from '@chakra-ui/button';
-import { Flex, Text, Box, VStack, Link } from '@chakra-ui/layout';
+import { Flex, Text, Box, VStack, Link, HStack } from '@chakra-ui/layout';
 import React, { useEffect, useRef, useState } from 'react'
-// import { useApp } from '../state/app';
 import sampleMandala from '../assets/img/sample-mandala.svg'
 import { Image } from '@chakra-ui/image';
 import { getPriceFromId } from '../utils/price';
@@ -35,7 +34,7 @@ const savePng = async (svg: string, name: string) => {
 }
 
 const MandalaCard = ({ mandala }) => {
-    const { contract: contractInstance, setupContract, userAddress, openSendModal, wallet, setMigratingMandala } = useApp()
+    const { contract: contractInstance, setupContract, userAddress, openSendModal, wallet, setMigratingMandala, setRenamingMandala } = useApp()
     const [status, setStatus] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [errorDescription, setErrorDescription] = useState(null);
@@ -61,7 +60,7 @@ const MandalaCard = ({ mandala }) => {
     const isSeed = mandala.rarity === 'Seed';
     const userOwns = mandala.ownerAddress === userAddress
     const isOld = mandala?.old;
-
+    const canBeRenamed = Math.floor(+new Date / 1000) > (parseInt(mandala.nextRenameAt || mandala.canBeRenamedAt) + 2629743) && !isSeed && userOwns
     const showConvertButton = isSeed && userOwns && !isOld;
     const showDownloadButton = !isSeed && userOwns && !isOld;
 
@@ -143,8 +142,13 @@ const MandalaCard = ({ mandala }) => {
     const handleDownload = () => {
         savePng(svg, mandala.name)
     }
+
     const handleMigrate = () => {
         setMigratingMandala(mandala)
+    }
+
+    const handleRename = () => {
+        setRenamingMandala(mandala)
     }
 
 
@@ -173,16 +177,22 @@ const MandalaCard = ({ mandala }) => {
                     {mandala.name && mandala.name !== "Seed" && <Text isTruncated fontSize="12px">{mandala.name}</Text>}
                 </Flex>
                 <Flex padding="8px" minH="48px" justify="space-between" align="center">
-                    {userOwns && !isOld ? <Button boxShadow="none" size="sm"
-                        background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleSend}>Send</Button> :
-                        <Text fontSize="sm" fontWeight="500">
-                            {`${getPriceFromId(parseInt(mandala.id) + 1)} tez`}
-                        </Text>}
-                    {showConvertButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleCreateMandala}>Create Mandala</Button>}
-                    {showDownloadButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleDownload} variant="mandala-card">Download</Button>}
-                    {!userOwns && <a target="_blank" rel="noreferrer noopener" href={`https://better-call.dev/${config.network}/${mandala.ownerAddress}/`}> <Text fontSize="xs">{
-                        shortage(mandala.ownerAddress)}</Text> </a>}
-                    {isOld && userOwns && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleMigrate} variant="mandala-card">Manage</Button>}
+                    <Flex>
+                        {userOwns && !isOld ? <Button boxShadow="none" size="sm"
+                            background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleSend}>Send</Button> :
+                            <Text fontSize="sm" fontWeight="500">
+                                {`${getPriceFromId(parseInt(mandala.id) + 1)} tez`}
+                            </Text>}
+                    </Flex>
+                    <HStack spacing={2}>
+                        {showConvertButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" variant="mandala-card" onClick={handleCreateMandala}>Create Mandala</Button>}
+                        {canBeRenamed && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleRename} variant="mandala-card">Rename</Button>}
+
+                        {showDownloadButton && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleDownload} variant="mandala-card">Download</Button>}
+                        {!userOwns && <a target="_blank" rel="noreferrer noopener" href={`https://better-call.dev/${config.network}/${mandala.ownerAddress}/`}> <Text fontSize="xs">{
+                            shortage(mandala.ownerAddress)}</Text> </a>}
+                        {isOld && userOwns && <Button boxShadow="none" size="sm" background="linear-gradient(145deg, #ffffff, #e6e6e6)" onClick={handleMigrate} variant="mandala-card">Manage</Button>}
+                    </HStack>
                 </Flex>
             </Flex>
             {/* <Modal isOpen={isOpen} onClose={() => {

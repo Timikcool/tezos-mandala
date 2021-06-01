@@ -55,6 +55,7 @@ export const AppProvider: React.FC = ({ children }) => {
     const [buyingSeed, setBuyingSeed] = useState<boolean>(false);
     const [convertingSeed, setConvertingSeed] = useState<boolean>(false);
     const [migratingMandala, setMigratingMandala] = useState(null);
+    const [renamingMandala, setRenamingMandala] = useState(null);
 
     // * contract
     // https://better-call.dev/edo2net/KT1C1ESWEedUGdSPvWsaKJQNhkUJUHuXBVQU
@@ -255,6 +256,8 @@ export const AppProvider: React.FC = ({ children }) => {
         closeSendModal,
         setupContract,
         setMigratingMandala,
+        setRenamingMandala,
+        renamingMandala,
         migratingMandala,
         userAddress,
         wallet,

@@ -9,5 +9,5 @@
     "tokensCache": "https://tezos-mandala.art/static/KT1DKBvxiwDR7qazNuuxCxY2AaXnoytmDE7H.json",
     "tokenService": "https://tezos-mandala.art",
     "oldContract": "KT1EH8yKXkRoxNkULRB1dSuwhkKyi5LJH82o",
-    "oldTokensCache": "https://tezos-mandala.art/static/KT1EH8yKXkRoxNkULRB1dSuwhkKyi5LJH82o.json"
+    "oldTokensCache": "https://tezos-mandala.art/static/cache.json"
 }

@@ -13,6 +13,7 @@
     "@taquito/ledger-signer": "^8.0.3-beta.0",
     "@taquito/signer": "^8.0.6-beta.0",
     "@taquito/taquito": "^8.0.3-beta.0",
+    "@taquito/utils": "^8.1.1",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.6.3",

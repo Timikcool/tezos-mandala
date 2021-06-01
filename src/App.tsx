@@ -13,6 +13,7 @@ import { Footer } from "./components/Footer";
 import SendMandalaModal from "./components/SendMandalaModal";
 import { MigrationPage } from "./pages/MigrationPage";
 import MigratingMandalaModal from "./components/MigratingMandalaModal";
+import RenameMandalaModal from "./components/RenameModal";
 
 const history = createBrowserHistory({});
 
@@ -39,6 +40,7 @@ const App = () => {
       <Footer />
       <SendMandalaModal />
       <MigratingMandalaModal />
+      <RenameMandalaModal />
     </>
   )
 };

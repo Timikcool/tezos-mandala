@@ -56,7 +56,7 @@ const MainPage = () => {
     const storage = await contract.storage();
     const nextId = storage.next_id.toNumber();
     console.log({ nextId, contractInstance });
-    setNextId(parseInt(nextId || 2) - 1);
+    setNextId(parseInt(nextId || 2));
   }, [setNextId]);
 
   useEffect(() => {
@@ -322,9 +322,12 @@ const MainPage = () => {
               change its name again once you have owned the mandala for two
               months. Then, you can rename your mandala in 4 months, then in 8
               months, and so on, with the time span doubling after each
-              renaming. Tezos Mandalas are not stored on the Amazon cloud and
-              not even on IPFS, they are recorded in the Tezos blockchain
-              forever. That is why they are truly decentralized and trustless.
+              renaming.{" "}
+              <span style={{ fontWeight: "bold" }}>
+                Tezos Mandalas are not stored on the Amazon cloud and not even
+                on IPFS, they are recorded in the Tezos blockchain forever.
+              </span>{" "}
+              That is why they are truly decentralized and trustless.
             </Text>
 
             <Text fontSize="lg" align="left" fontWeight="300">

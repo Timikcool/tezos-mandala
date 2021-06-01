@@ -50,72 +50,7 @@ const SendMandalaModal = () => {
                 <ModalHeader isTruncated>{`Send #${mandalaToSend.id} mandala`}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody >
-                    {/* {
-                        status === 'initial' && (<VStack spacing={4}>
-                            <Text>
-                                You are buying mandala seed which might be converted to mandala whenever you want, or traded as well
-                    </Text>
-                            <Text>
-                                For conversion go to My Collection and click Create Mandala button on Seed card
-                    </Text>
 
-                        </VStack>)
-                    }
-
-                    {
-                        status === 'processing' && (<VStack spacing={8}>
-                            <Text >Please wait...</Text>
-                            <Spinner
-                                thickness="4px"
-                                speed="0.65s"
-                                emptyColor="gray.200"
-                                color="orange.500"
-                                size="xl"
-                            />
-                        </VStack>)
-                    }
-
-                    {
-                        status === 'success' && (<Alert
-                            status="success"
-                            variant="subtle"
-                            flexDirection="column"
-                            alignItems="center"
-                            justifyContent="center"
-                            textAlign="center"
-                            height="200px"
-                            borderRadius="6px"
-                        >
-                            <AlertIcon boxSize="40px" mr={0} />
-                            <AlertTitle mt={4} mb={1} fontSize="lg">
-                                Success!
-                        </AlertTitle>
-                            <AlertDescription maxWidth="sm">
-                                Your transaction successfuly sent. Mandala Seed will appear at My Collection tab after confirmation.
-                        </AlertDescription>
-                        </Alert>)
-                    }
-
-                    {
-                        status === 'error' && (<Alert
-                            status="error"
-                            variant="subtle"
-                            flexDirection="column"
-                            alignItems="center"
-                            justifyContent="center"
-                            textAlign="center"
-                            height="200px"
-                            borderRadius="6px"
-                        >
-                            <AlertIcon boxSize="40px" mr={0} />
-                            <AlertTitle mt={4} mb={1} fontSize="lg">
-                                Error
-                        </AlertTitle>
-                            <AlertDescription maxWidth="sm">
-                                Something went wrong. Please try again
-                        </AlertDescription>
-                        </Alert>)
-                    } */}
                     <VStack spacing={4}>
 
                         <Text mb="8px">Transfer address:</Text>
@@ -135,12 +70,7 @@ const SendMandalaModal = () => {
                 </ModalBody>
 
                 <ModalFooter>
-                    {/* <Button colorScheme="red" mr={3} onClick={onClose}>
-                        Close
-                    </Button> */}
-                    {/* {status === 'initial' && <Button variant="outline"
-                        colorScheme="black"
-                        border="none" onClick={handleBuy} _focus={{ background: '#e2e8f0' }} >Buy Seed</Button>} */}
+
                     <Button variant="outline"
                         colorScheme="black"
                         border="none" onClick={handleSend} _focus={{ background: '#e2e8f0' }} >Send</Button>
